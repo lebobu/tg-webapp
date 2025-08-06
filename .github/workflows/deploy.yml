@@ -1,23 +1,25 @@
-name: Deploy to Server
+name: Deploy to Server via SSH
 
 on:
   push:
     branches:
-      - master  # или main
+      - master  # или main, если твоя ветка называется иначе
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
-
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.DEPLOY_BEGET }}
 
     - name: Deploy via SSH
       run: |
-        ssh -o StrictHostKeyChecking=no root@217.114.1.224 "cd /tg-webapp-test-hook && git pull"
+        echo "${{ secrets.DEPLOY_KEY }}" > key.pem
+        chmod 600 key.pem
+
+        ssh -i key.pem -o StrictHostKeyChecking=no root@217.114.1.224 "
+          cd /tg-webapp-test-hook &&
+          git pull &&
+          echo 'Deployed at: ' \$(date)
+        "
