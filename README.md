@@ -5,4 +5,5 @@ pm2 startOrReload /root/tg-webapp-test/ecosystem.config.cjs
 2. To print logs pm2 logs
 
 Both steps are executed in run.sh via ./run.sh
+
 06 08 2025
