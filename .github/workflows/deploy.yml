@@ -19,6 +19,6 @@ jobs:
 
       - name: Deploy over SSH
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem root@217.114.1.224
+          ssh -vvv -o StrictHostKeyChecking=no -i key.pem root@217.114.1.224
 
           '
