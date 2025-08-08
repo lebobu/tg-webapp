@@ -2,14 +2,15 @@ name: Deploy to Server
 
 on:
   push:
-    branches: [ master ]  # слушаем обе, оставь одну если знаешь точно
+    branches: [ master ]   # слушаем обе; оставь одну, если точно знаешь
+  workflow_dispatch:              # ручной запуск из вкладки Actions
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo (not strictly required for SSH-only deploy)
+      - name: (Optional) Checkout repository
         uses: actions/checkout@v4
 
       - name: Write SSH key from secret
@@ -17,8 +18,6 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Deploy over SSH
+      - name: Open SSH session (forced-command runs on server)
         run: |
-          ssh -vvv -o StrictHostKeyChecking=no -i key.pem root@217.114.1.224
-
-          '
+          ssh -o StrictHostKeyChecking=no -i key.pem root@217.114.1.224
