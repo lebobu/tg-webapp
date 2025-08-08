@@ -15,7 +15,7 @@ jobs:
 
     - name: Deploy via SSH
       run: |
-        echo "${{ secrets.DEPLOY_KEY }}" > key.pem
+        echo "${{ secrets.DEPLOY_BEGET }}" > key.pem
         chmod 600 key.pem
 
         ssh -i key.pem -o StrictHostKeyChecking=no root@217.114.1.224 "
