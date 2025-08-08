@@ -1,26 +1,28 @@
-name: Deploy to Server via SSH
+name: Deploy to Server
 
 on:
   push:
-    branches:
-      - master  # или main, если твоя ветка называется иначе
+    branches: [ master ]   # или main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Deploy via SSH
-  run: |
-    echo "${{ secrets.DEPLOY_BEGET }}" > key.pem
-    chmod 600 key.pem
-    ssh -vvv -i key.pem -o StrictHostKeyChecking=no root@217.114.1.224 "
-      set -xe
-      git -C /tg-webapp-test-hook rev-parse --is-inside-work-tree
-      git -C /tg-webapp-test-hook remote -v
-      git -C /tg-webapp-test-hook status
-      git -C /tg-webapp-test-hook pull
-    "
+      - name: Write SSH key from secret
+        run: |
+          echo "${{ secrets.DEPLOY_BEGET }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Debug and deploy via SSH
+        run: |
+          ssh -vvv -i key.pem -o StrictHostKeyChecking=no root@217.114.1.224 '
+            set -xe
+            git -C /tg-webapp-test-hook rev-parse --is-inside-work-tree
+            git -C /tg-webapp-test-hook remote -v
+            git -C /tg-webapp-test-hook status
+            git -C /tg-webapp-test-hook pull
+          '
