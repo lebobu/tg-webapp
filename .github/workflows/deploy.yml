@@ -14,12 +14,13 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Deploy via SSH
-      run: |
-        echo "${{ secrets.DEPLOY_BEGET }}" > key.pem
-        chmod 600 key.pem
-
-        ssh -i key.pem -o StrictHostKeyChecking=no root@217.114.1.224 "
-          cd /tg-webapp-test-hook &&
-          git pull &&
-          echo 'Deployed at: ' \$(date)
-        "
+  run: |
+    echo "${{ secrets.DEPLOY_BEGET }}" > key.pem
+    chmod 600 key.pem
+    ssh -vvv -i key.pem -o StrictHostKeyChecking=no root@217.114.1.224 "
+      set -xe
+      git -C /tg-webapp-test-hook rev-parse --is-inside-work-tree
+      git -C /tg-webapp-test-hook remote -v
+      git -C /tg-webapp-test-hook status
+      git -C /tg-webapp-test-hook pull
+    "
