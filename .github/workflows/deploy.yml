@@ -2,7 +2,7 @@ name: Deploy to Server
 
 on:
   push:
-    branches: [ master ]   # слушаем обе; оставь одну, если точно знаешь
+    branches: [ main ]   # слушаем обе; оставь одну, если точно знаешь
   workflow_dispatch:              # ручной запуск из вкладки Actions
 
 jobs:
