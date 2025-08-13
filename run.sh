@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-cd /root/tg-webapp-test           # ensure you’re in the project dir
+cd /root/tg-webapp-test-hook           # ensure you’re in the project dir
 pm2 delete tgwatest-bot-hook           # remove old process
 pm2 flush                         # clear logs
 rm -f ~/.pm2/logs/tgwatest-bot-out.log ~/.pm2/logs/tgwatest-bot-error.log
