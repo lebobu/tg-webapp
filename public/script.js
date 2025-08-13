@@ -1,17 +1,24 @@
-// script.js
+// public/script.js
 const tg = window.Telegram.WebApp;
-
-// let the WebApp expand to full height
 tg.expand();
 
-// when button is clicked, grab user info and send it
-document.getElementById('send_btn').addEventListener('click', () => {
-  const user = tg.initDataUnsafe.user || {};
-  console.log('🧪 Sending user data:', user);
+const user = tg.initDataUnsafe.user;
+const initData = tg.initData;
+const platform = tg.platform;
 
-  // send user JSON as string to bot
-  tg.sendData(JSON.stringify(user));
+document.addEventListener('DOMContentLoaded', () => {
+  if (!user) {
+    document.getElementById('greeting').innerText = "User not found.";
+    return;
+  }
 
-  // close WebApp to trigger update to bot
-  tg.close();
+  document.getElementById('greeting').innerText =
+    `Hello, ${user.first_name}${user.last_name ? ' ' + user.last_name : ''}!`;
+
+  // Отправка данных на сервер
+  fetch('/data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user, initData, platform })
+  }).catch(console.error);
 });
