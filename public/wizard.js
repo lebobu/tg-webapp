@@ -17,9 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
       (currentStep === 1 && !data.plan) ||
       (currentStep === 2 && (!data.accounts || !data.duration))
     ) {
+      nextBtn.setAttribute.add("title","Check");
       // nextBtn.setAttribute("disabled", "true");
       nextBtn.classList.add("disabled");
     } else {
+      nextBtn.setAttribute.add("title","Далее");
+
       // nextBtn.removeAttribute("disabled");
       nextBtn.classList.remove("disabled");
     }
