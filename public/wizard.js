@@ -12,6 +12,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const backBtn = document.getElementById("back");
   const nextBtn = document.getElementById("next");
 
+  function updateNextButtonState() {
+    if (
+      (currentStep === 1 && !data.plan) ||
+      (currentStep === 2 && (!data.accounts || !data.duration))
+    ) {
+      nextBtn.setAttribute("disabled", "true");
+      nextBtn.classList.add("disabled");
+    } else {
+      nextBtn.removeAttribute("disabled");
+      nextBtn.classList.remove("disabled");
+    }
+  }
+
   function showStep(step) {
     steps.forEach((el, idx) => {
       el.style.display = idx === step - 1 ? "block" : "none";
@@ -24,13 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const summary = document.getElementById("summary");
       summary.innerHTML = `
         <p><strong>Вы выбрали:</strong></p>
-        <ul style="list-style-type: none;">
+        <ul style="list-style-type: none; padding: 0; margin: 0;">
           <li>Тариф: ${data.plan || '-'} </li>
           <li>Аккаунтов: ${data.accounts || '-'} </li>
           <li>Срок: ${data.duration || '-'} мес.</li>
         </ul>
       `;
     }
+    updateNextButtonState();
   }
 
   document.querySelectorAll(".btn.option").forEach((btn) => {
@@ -66,6 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!isSelected) {
         e.target.classList.add("selected");
       }
+
+      updateNextButtonState();
     });
   });
 

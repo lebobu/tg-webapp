@@ -92,5 +92,8 @@ h2 {
   transition: background 0.2s;
   flex: 1;
   min-width: 100px;
+  display: flex; 
+  flex-direction: column; 
+  align-items: center;
 }
 
