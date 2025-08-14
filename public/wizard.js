@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const summary = document.getElementById("summary");
       summary.innerHTML = `
         <p><strong>Вы выбрали:</strong></p>
-        <ul style="list-style-type: none;">
+        <ul>
           <li>Тариф: ${data.plan || '-'} </li>
           <li>Аккаунтов: ${data.accounts || '-'} </li>
           <li>Срок: ${data.duration || '-'} мес.</li>
@@ -36,13 +36,36 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".btn.option").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const { plan, accounts, duration } = e.target.dataset;
-      if (plan) data.plan = plan;
-      if (accounts) data.accounts = accounts;
-      if (duration) data.duration = duration;
+      const isSelected = e.target.classList.contains("selected");
+
+      if (plan) {
+        if (isSelected) {
+          delete data.plan;
+        } else {
+          data.plan = plan;
+        }
+      }
+      if (accounts) {
+        if (isSelected) {
+          delete data.accounts;
+        } else {
+          data.accounts = accounts;
+        }
+      }
+      if (duration) {
+        if (isSelected) {
+          delete data.duration;
+        } else {
+          data.duration = duration;
+        }
+      }
 
       const group = e.target.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
-      e.target.classList.add("selected");
+
+      if (!isSelected) {
+        e.target.classList.add("selected");
+      }
     });
   });
 
@@ -69,3 +92,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   showStep(currentStep);
 });
+

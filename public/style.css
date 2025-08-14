@@ -25,7 +25,7 @@ h2 {
   margin: 20px 0;
 }
 
-.btn, #summary {
+.btn {
   padding: 10px 20px;
   background-color: #0088cc;
   color: white;
@@ -80,3 +80,17 @@ h2 {
     align-items: stretch;
   }
 }
+
+#summary {
+  padding: 10px 10px;
+  background-color: #0088cc;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  transition: background 0.2s;
+  flex: 1;
+  min-width: 100px;
+}
+
