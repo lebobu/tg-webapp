@@ -12,6 +12,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const backBtn = document.getElementById("back");
   const nextBtn = document.getElementById("next");
 
+  function showCustomAlert(message) {
+    let existing = document.getElementById("custom-alert");
+    if (existing) existing.remove();
+
+    const alertBox = document.createElement("div");
+    alertBox.id = "custom-alert";
+    alertBox.style.position = "fixed";
+    alertBox.style.top = "0";
+    alertBox.style.left = "0";
+    alertBox.style.width = "100%";
+    alertBox.style.height = "100vh";
+    alertBox.style.background = "rgba(0,0,0,0.6)";
+    alertBox.style.display = "flex";
+    alertBox.style.alignItems = "center";
+    alertBox.style.justifyContent = "center";
+    alertBox.style.zIndex = "9999";
+
+    alertBox.innerHTML = `
+      <div style="background:white; padding:20px 30px; border-radius:10px; max-width: 300px; text-align:center;">
+        <h3 style="margin-top:0">Внимание!</h3>
+        <p>${message}</p>
+        <button style="margin-top:10px; padding:6px 16px; background:#0088cc; color:white; border:none; border-radius:6px; font-weight:bold" onclick="document.getElementById('custom-alert').remove()">ОК</button>
+      </div>
+    `;
+    
   // function updateNextButtonState() {
   //   if (
   //     (currentStep === 1 && !data.plan) ||
@@ -90,11 +115,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   nextBtn.addEventListener("click", () => {
     if (currentStep === 1 && !data.plan) {
-      alert("Пожалуйста, выберите вариант на первом шаге.");
+      showCustomAlert("Пожалуйста, выберите вариант на первом шаге");
       return;
     }
     if (currentStep === 2 && (!data.accounts || !data.duration)) {
-      alert("Пожалуйста, выберите количество аккаунтов и срок подписки.");
+      showCustomAlert("Пожалуйста, выберите количество аккаунтов и срок подписки");
       return;
     }
     if (currentStep < totalSteps) {
