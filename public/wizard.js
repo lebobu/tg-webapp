@@ -70,14 +70,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   nextBtn.addEventListener("click", () => {
+    if (currentStep === 1 && !data.plan) {
+      alert("Пожалуйста, выберите вариант на первом шаге.");
+      return;
+    }
+    if (currentStep === 2 && (!data.accounts || !data.duration)) {
+      alert("Пожалуйста, выберите количество аккаунтов и срок подписки.");
+      return;
+    }
     if (currentStep < totalSteps) {
       currentStep++;
       showStep(currentStep);
     } else {
-      if (!data.plan || !data.accounts || !data.duration) {
-        alert("Пожалуйста, выберите все параметры подписки.");
-        return;
-      }
       tg.sendData(JSON.stringify(data));
       tg.close();
     }
@@ -92,4 +96,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   showStep(currentStep);
 });
-
