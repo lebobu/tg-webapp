@@ -4,7 +4,7 @@ tg.expand();
 
 document.addEventListener("DOMContentLoaded", () => {
   let currentStep = 1;
-  const totalSteps = 3;
+  const totalSteps = 2;
   const data = {};
 
   const steps = document.querySelectorAll(".step");
@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (plan) data.plan = plan;
       if (accounts) data.accounts = accounts;
       if (duration) data.duration = duration;
+
       // визуальная отметка выбора
       const group = e.target.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
@@ -41,7 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
       currentStep++;
       showStep(currentStep);
     } else {
-      // отправка в Telegram
+      // валидация (не обязательно)
+      if (!data.plan || !data.accounts || !data.duration) {
+        alert("Пожалуйста, выберите все параметры подписки.");
+        return;
+      }
       tg.sendData(JSON.stringify(data));
       tg.close();
     }
