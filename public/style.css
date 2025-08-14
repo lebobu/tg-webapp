@@ -25,7 +25,7 @@ h2 {
   margin: 20px 0;
 }
 
-.btn {
+.btn, #summary {
   padding: 10px 20px;
   background-color: #0088cc;
   color: white;
@@ -38,6 +38,7 @@ h2 {
   min-width: 100px;
   text-align: center;
 }
+
 
 .btn:hover {
   background-color: #0070a8;
@@ -71,4 +72,15 @@ h2 {
 
 .nav-buttons {
   justify-content: space-between;
+}
+
+@media (max-width: 480px) {
+  .nav-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn {
+    flex: none;
+    width: 100%;
+  }
 }
