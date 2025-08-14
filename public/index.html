@@ -13,49 +13,52 @@
   <script defer src="script.js"></script>
 </head>
 <body>
-  <!-- <h1 id="greeting">Loading...</h1> -->
-  <!-- <section id="variant1"> -->
-    <!-- <h2>Вариант 1. Wizard с прогресс-баром</h2> -->
-    <div class="cart">🛒<sup id="cart-count">1</sup></div>
+  <div class="cart">🛒<sup id="cart-count">1</sup></div>
 
-    <!-- Шаг 1 -->
-    <div class="step step-1">
-      <p><strong>Шаг 1/3: Выберите </strong></p>
-      <div class="buttons">
-        <a href="#" class="btn option" data-plan="Eu">Я в России (хочу youtube)</a>
-        <a href="#" class="btn option" data-plan="Ru">Я за границей (хочу госуслуги)</a>
-        <a href="#" class="btn option" data-plan="Router">Настройка на роутере</a>
-        <a href="#" class="btn option" data-plan="VPS">Персональный сервер</a>
-      </div>
+  <!-- Шаг 1 -->
+  <div class="step step-1">
+    <p><strong>Шаг 1/3: Выберите подписку</strong></p>
+    <div class="buttons">
+      <a href="#" class="btn option" data-plan="Eu">Я в России (хочу youtube)</a>
+      <a href="#" class="btn option" data-plan="Ru">Я за границей (хочу госуслуги)</a>
+      <a href="#" class="btn option" data-plan="Router">Настройка на роутере</a>
+      <a href="#" class="btn option" data-plan="VPS">Персональный сервер</a>
     </div>
+  </div>
 
-    <!-- Шаг 2 -->
-    <div class="step step-2" style="display:none">
-      <p><strong>Шаг 2/2: Настройка аккаунтов и срока</strong></p>
-      <div class="buttons">
-        <span style="width: 100%; text-align: center; font-weight: bold;">Аккаунты</span>
-        <a href="#" class="btn option" data-accounts="1">1 аккаунт</a>
-        <a href="#" class="btn option" data-accounts="3">3 аккаунта</a>
-        <a href="#" class="btn option" data-accounts="5">5 аккаунтов</a>
-      </div>
-      <div class="buttons">
-        <span style="width: 100%; text-align: center; font-weight: bold;">Срок</span>
-        <a href="#" class="btn option" data-duration="1">1 месяц</a>
-        <a href="#" class="btn option" data-duration="3">3 месяца</a>
-        <a href="#" class="btn option" data-duration="6">6 месяцев</a>
-      </div>
+  <!-- Шаг 2 -->
+  <div class="step step-2" style="display:none">
+    <p><strong>Шаг 2/3: Настройка аккаунтов и срока</strong></p>
+    <div class="buttons">
+      <span style="width: 100%; text-align: center; font-weight: bold;">Аккаунты</span>
+      <a href="#" class="btn option" data-accounts="1">1 аккаунт</a>
+      <a href="#" class="btn option" data-accounts="3">3 аккаунта</a>
+      <a href="#" class="btn option" data-accounts="5">5 аккаунтов</a>
     </div>
+    <div class="buttons">
+      <span style="width: 100%; text-align: center; font-weight: bold;">Срок</span>
+      <a href="#" class="btn option" data-duration="1">1 месяц</a>
+      <a href="#" class="btn option" data-duration="3">3 месяца</a>
+      <a href="#" class="btn option" data-duration="6">6 месяцев</a>
+    </div>
+  </div>
 
-    <!-- Прогресс-бар -->
-    <div class="progress">
-      <div class="progress-bar" id="progress-bar" style="width: 33%"></div>
-    </div>
+  <!-- Шаг 3 -->
+  <div class="step step-3" style="display:none">
+    <p><strong>Шаг 3/3: Подтверждение</strong></p>
+    <div id="summary" style="padding: 1em; background: #eef; border-radius: 8px;"></div>
+  </div>
 
-    <!-- Кнопки управления -->
-    <div class="buttons nav-buttons">
-      <a href="#" class="btn" id="back">Назад</a>
-      <a href="#" class="btn full" id="next">Далее</a>
-    </div>
+  <!-- Прогресс-бар -->
+  <div class="progress">
+    <div class="progress-bar" id="progress-bar" style="width: 33%"></div>
+  </div>
+
+  <!-- Кнопки управления -->
+  <div class="buttons nav-buttons">
+    <a href="#" class="btn" id="back">Назад</a>
+    <a href="#" class="btn full" id="next">Далее</a>
+  </div>
 
   <script src="wizard.js"></script>
 </body>

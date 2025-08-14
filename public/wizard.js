@@ -4,7 +4,7 @@ tg.expand();
 
 document.addEventListener("DOMContentLoaded", () => {
   let currentStep = 1;
-  const totalSteps = 2;
+  const totalSteps = 3;
   const data = {};
 
   const steps = document.querySelectorAll(".step");
@@ -18,10 +18,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     progressBar.style.width = `${(step / totalSteps) * 100}%`;
     backBtn.style.display = step === 1 ? "none" : "inline-block";
-    nextBtn.textContent = step === totalSteps ? "Готово" : "Далее";
+    nextBtn.textContent = step === totalSteps ? "Подтвердить" : "Далее";
+
+    if (step === 3) {
+      const summary = document.getElementById("summary");
+      summary.innerHTML = `
+        <p><strong>Вы выбрали:</strong></p>
+        <ul>
+          <li>Тариф: ${data.plan || '-'} </li>
+          <li>Аккаунтов: ${data.accounts || '-'} </li>
+          <li>Срок: ${data.duration || '-'} мес.</li>
+        </ul>
+      `;
+    }
   }
 
-  // обработка выбора опций
   document.querySelectorAll(".btn.option").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const { plan, accounts, duration } = e.target.dataset;
@@ -29,20 +40,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (accounts) data.accounts = accounts;
       if (duration) data.duration = duration;
 
-      // визуальная отметка выбора
       const group = e.target.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
       e.target.classList.add("selected");
     });
   });
 
-  // навигация вперёд
   nextBtn.addEventListener("click", () => {
     if (currentStep < totalSteps) {
       currentStep++;
       showStep(currentStep);
     } else {
-      // валидация (не обязательно)
       if (!data.plan || !data.accounts || !data.duration) {
         alert("Пожалуйста, выберите все параметры подписки.");
         return;
@@ -52,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // навигация назад
   backBtn.addEventListener("click", () => {
     if (currentStep > 1) {
       currentStep--;
