@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const summary = document.getElementById("summary");
       summary.innerHTML = `
         <p><strong>Вы выбрали:</strong></p>
-        <ul>
+        <ul style="list-style-type: none;">
           <li>Тариф: ${data.plan || '-'} </li>
           <li>Аккаунтов: ${data.accounts || '-'} </li>
           <li>Срок: ${data.duration || '-'} мес.</li>
