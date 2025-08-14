@@ -12,21 +12,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const backBtn = document.getElementById("back");
   const nextBtn = document.getElementById("next");
 
-  function updateNextButtonState() {
-    if (
-      (currentStep === 1 && !data.plan) ||
-      (currentStep === 2 && (!data.accounts || !data.duration))
-    ) {
-      nextBtn.setAttribute.add("title","Check");
-      // nextBtn.setAttribute("disabled", "true");
-      nextBtn.classList.add("disabled");
-    } else {
-      nextBtn.setAttribute.add("title","Далее");
+  // function updateNextButtonState() {
+  //   if (
+  //     (currentStep === 1 && !data.plan) ||
+  //     (currentStep === 2 && (!data.accounts || !data.duration))
+  //   ) {
+  //     nextBtn.setAttribute.add("title","Check");
+  //     // nextBtn.setAttribute("disabled", "true");
+  //     nextBtn.classList.add("disabled");
+  //   } else {
+  //     nextBtn.setAttribute.add("title","Далее");
 
-      // nextBtn.removeAttribute("disabled");
-      nextBtn.classList.remove("disabled");
-    }
-  }
+  //     // nextBtn.removeAttribute("disabled");
+  //     nextBtn.classList.remove("disabled");
+  //   }
+  // }
 
   function showStep(step) {
     steps.forEach((el, idx) => {
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </ul>
       `;
     }
-    updateNextButtonState();
+    // updateNextButtonState();
   }
 
   document.querySelectorAll(".btn.option").forEach((btn) => {
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.target.classList.add("selected");
       }
 
-      updateNextButtonState();
+      // updateNextButtonState();
     });
   });
 
