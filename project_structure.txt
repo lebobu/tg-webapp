@@ -1,0 +1,23 @@
+.
+├── README.md
+├── controllers
+│   └── telegramController.js
+├── ecosystem.config.cjs
+├── logs
+├── models
+│   └── userModel.js
+├── package-lock.json
+├── package.json
+├── project_structure.txt
+├── public
+│   ├── img
+│   ├── index.html
+│   ├── script.js
+│   ├── style.css
+│   └── wizard.js
+├── run.sh
+├── server.js
+├── server_by_vova.js
+└── views
+
+7 directories, 14 files
