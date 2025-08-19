@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-cd /root/tg-webapp-test-hook           # ensure you’re in the project dir
-pm2 delete tgwatest-bot-hook           # remove old process
+cd /root/tg-webapp           # ensure you’re in the project dir
+pm2 delete tg-webapp-bot           # remove old process
 pm2 flush                         # clear logs
-rm -f ~/.pm2/logs/tgwatest-bot-out.log ~/.pm2/logs/tgwatest-bot-error.log
+rm -f ~/.pm2/logs/tg-webapp-bot-out.log ~/.pm2/logs/tg-webapp-bot-error.log
 pm2 start server.js \
-    --name tgwatest-bot-hook \
-    --cwd /root/tg-webapp-test-hook \
+    --name tg-webapp-bot \
+    --cwd /root/tg-webapp \
     --update-env                  # reload env vars (including .env if you source it)
 pm2 save                          # persist process list
-pm2 logs tgwatest-bot-hook             # tail logs
+pm2 logs tg-webapp-bot             # tail logs
