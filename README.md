@@ -7,4 +7,5 @@ pm2 startOrReload /root/tg-webapp-test/ecosystem.config.cjs
 Both steps are executed in run.sh via ./run.sh
 
 # Logic
+# Structure ready
 
