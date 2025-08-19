@@ -1,7 +1,7 @@
 // controllers/telegramController.js
 module.exports = (bot) => ({
   onStartCommand: (msg) => {
-    bot.sendMessage(msg.chat.id, 'Click below to open the WebApp:', {
+    bot.sendMessage(msg.chat.id, 'Нажмите кнопку Каталог', {
       reply_markup: {
         inline_keyboard: [[{
           text: 'Open Web App',
