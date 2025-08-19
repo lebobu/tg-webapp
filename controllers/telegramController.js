@@ -4,7 +4,7 @@ module.exports = (bot) => ({
     bot.sendMessage(msg.chat.id, 'Нажмите кнопку Каталог', {
       reply_markup: {
         inline_keyboard: [[{
-          text: 'Open Web App',
+          text: 'Открыть каталог',
           web_app: { url: process.env.SERVER_URL }
         }]]
       }
