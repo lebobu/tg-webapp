@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 cd /root/tg-webapp           # ensure you’re in the project dir
 pm2 delete tg-webapp-bot           # remove old process
 pm2 flush                         # clear logs
