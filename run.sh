@@ -10,3 +10,4 @@ pm2 start server.js \
     --update-env                  # reload env vars (including .env if you source it)
 pm2 save                          # persist process list
 pm2 logs tg-webapp-bot --lines 100 --nostream || true            # tail logs
+#
