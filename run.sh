@@ -30,7 +30,7 @@ fi
 
 # === настройки ===
 APP_DIR="/root/tg-webapp"   # <— проверь свой фактический путь!
-APP_NAME="tgwebapp-bot"               # <— имя процесса в PM2
+APP_NAME="tg-webapp-bot"               # <— имя процесса в PM2
 ENTRY="server.js"                     # точка входа
 
 # Защита от CRLF в .sh
