@@ -2,11 +2,11 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const user = tg.initDataUnsafe.user;
-const initData = tg.initData;
-const platform = tg.platform;
-
 document.addEventListener('DOMContentLoaded', () => {
+  const user = tg.initDataUnsafe?.user;
+  const initData = tg.initData;
+  const platform = tg.platform;
+
   if (!user) {
     document.getElementById('greeting').innerText = "User not found.";
     return;
@@ -15,10 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('greeting').innerText =
     `Hello, ${user.first_name}${user.last_name ? ' ' + user.last_name : ''}!`;
 
-  // Отправка данных на сервер
-  fetch('/data', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user, initData, platform })
-  }).catch(console.error);
+  // Отправляем данные и закрываем
+  const payload = { user, initData, platform };
+  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+  navigator.sendBeacon('/data', blob);
+
+  tg.close(); // можно закрыть сразу
 });
+

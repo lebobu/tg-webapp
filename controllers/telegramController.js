@@ -1,4 +1,8 @@
 // controllers/telegramController.js
+function escMd(s = '') {
+  return String(s).replace(/([_*[\]()~`>#+\-=|{}.!])/g, '\\$1');
+}
+
 module.exports = (bot) => ({
   onStartCommand: (msg) => {
     bot.sendMessage(msg.chat.id, 'Нажмите кнопку Каталог', {
@@ -16,21 +20,28 @@ module.exports = (bot) => ({
     res.sendStatus(200);
   },
 
-  onWebAppData: (req, res) => {
-    const { user, initData, platform } = req.body;
-    const chatId = user.id;
-    const fullName = `${user.first_name}${user.last_name ? ' ' + user.last_name : ''}`;
-    const username = user.username ? `@${user.username}` : 'N/A';
+  onWebAppData: async (req, res) => {
+    try {
+      const { user, initData, platform } = req.body || {};
+      if (!user?.id) return res.status(400).json({ ok: false, error: 'no user.id' });
 
-    const text = [
-      `🔔 *Your WebApp Data:*`,
-      `• *Name:* ${fullName}`,
-      `• *Username:* ${username}`,
-      `• *Platform:* ${platform}`,
-      `• *initData:* \`${initData}\``
-    ].join('\n');
+      const chatId = user.id;
+      const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'N/A';
+      const username = user.username ? `@${user.username}` : 'N/A';
 
-    bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
-    res.sendStatus(200);
+      const text = [
+        '🔔 *Your WebApp Data:*',
+        `• *Name:* ${escMd(fullName)}`,
+        `• *Username:* ${escMd(username)}`,
+        `• *Platform:* ${escMd(platform)}`,
+        `• *initData:* \`${String(initData || '').slice(0, 1500)}\``
+      ].join('\n');
+
+      await bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
+      res.json({ ok: true });
+    } catch (err) {
+      console.error('onWebAppData error:', err);
+      res.status(500).json({ ok: false });
+    }
   }
 });
