@@ -17,6 +17,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const telegramController = require('./controllers/telegramController')(bot);
 
+// после создания bot и telegramController:
+bot.on('message', telegramController.onWebAppMessage);
+
 // 🧠 Подключение логики
 bot.onText(/\/start/, telegramController.onStartCommand);
 app.post('/data', telegramController.onWebAppData);
