@@ -105,7 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
       <div style="font:600 16px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
         Итого: ${formatMoney(p.total)}
       </div>
-    `;
+    ` : ""}
+    ` : `;
 
     if (summaryEl) {
       summaryEl.innerHTML = `
