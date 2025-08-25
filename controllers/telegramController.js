@@ -1,4 +1,19 @@
 // controllers/telegramController.js
+
+// onStartCommand
+onStartCommand: (msg) => {
+  bot.sendMessage(msg.chat.id, 'Нажмите кнопку Каталог', {
+    reply_markup: {
+      keyboard: [[{
+        text: 'Открыть каталог',
+        web_app: { url: process.env.SERVER_URL }
+      }]],
+      resize_keyboard: true,
+      one_time_keyboard: true
+    }
+  });
+},
+
 function escMd(s = '') {
   return String(s).replace(/([_*[\]()~`>#+\-=|{}.!])/g, '\\$1');
 }
