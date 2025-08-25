@@ -44,14 +44,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthlyAfter = Math.round(baseMonthly * (1 - disc));
     const months = Number(duration);
     const total = monthlyAfter * months;
-    const baseTotal = baseMonthly * months;
+    const baseTotal = Math.round(baseMonthly * months*((100-disc)*0.01))/10 * 10;
     const savings = baseTotal - total;
 
     return {
       currency: cfg.currency || "₽",
       baseMonthly,
       monthlyAfter,
-      discount: disc,       // 0.20 => 20%
+      discount: disc,       // 20%
       months,
       total,
       baseTotal,
