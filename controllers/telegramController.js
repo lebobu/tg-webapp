@@ -10,7 +10,7 @@ function buildPriceLines(pricing) {
   if (!pricing) return [];
   const lines = [
     `• *Итого:* ${escMd(pricing.total)}`,
-    `• *Ежемесячно:* ${escMd(pricing.monthlyAfter)}`
+    // `• *Ежемесячно:* ${escMd(pricing.monthlyAfter)}`
   ];
   const extras = [];
   if (pricing.baseMonthly !== undefined) extras.push(`база ${pricing.baseMonthly}`);
