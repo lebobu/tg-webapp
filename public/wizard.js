@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthlyAfter = Math.round(baseMonthly * (1 - disc));
     const months = Number(duration);
     const total = monthlyAfter * months;
-    const baseTotal = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
+    const baseTotal = Math.round((baseMonthly * months*((100-disc)*0.01)));
+    // const baseTotal = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
     const savings = baseTotal - total;
 
     return {
