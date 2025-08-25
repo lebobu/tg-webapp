@@ -14,9 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const summaryEl = document.getElementById("summary");
 
   function showStep(step) {
-    steps.forEach((el, idx) => {
-      el.style.display = idx === step - 1 ? "block" : "none";
-    });
+    steps.forEach((el, idx) => { el.style.display = idx === step - 1 ? "block" : "none"; });
     progressBar.style.width = `${(step / totalSteps) * 100}%`;
     backBtn.style.display = step === 1 ? "none" : "inline-block";
     nextBtn.textContent = step === totalSteps ? "Подтвердить" : "Далее";
@@ -33,16 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // выбор опций
   document.querySelectorAll(".btn.option").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const t = e.currentTarget;
       const { plan, accounts, duration } = t.dataset;
-
       const group = t.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
       t.classList.add("selected");
-
       if (plan)     data.plan = plan;
       if (accounts) data.accounts = accounts;
       if (duration) data.duration = duration;
@@ -50,17 +45,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   async function sendInlineResult(payload) {
-    const qid = tg?.initDataUnsafe?.query_id; // есть ТОЛЬКО при запуске из inline-кнопки
+    const qid = tg?.initDataUnsafe?.query_id;
+    const fromId = tg?.initDataUnsafe?.user?.id;
+    const body = { query_id: qid, from_id: fromId, data: payload };
+
     if (!qid) {
-      // Fallback: если вдруг запустили не из inline-кнопки,
-      // используем стандартный sendData (вариант A)
+      // если вдруг запустили не из inline-кнопки — fallback
       try { tg?.sendData(JSON.stringify(payload)); } catch (_) {}
       return;
     }
 
-    const json = JSON.stringify({ query_id: qid, data: payload });
+    const json = JSON.stringify(body);
 
-    // сначала пробуем fetch + keepalive
+    // пробуем fetch + keepalive
     try {
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), 8000);
@@ -74,21 +71,16 @@ document.addEventListener("DOMContentLoaded", () => {
       clearTimeout(t);
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       return;
-    } catch (e) {
+    } catch (_) {
       // фолбэк на sendBeacon
-      try {
-        const blob = new Blob([json], { type: 'application/json' });
-        if (!navigator.sendBeacon('/webapp-answer', blob)) {
-          throw new Error('sendBeacon returned false');
-        }
-      } catch (err) {
+      const blob = new Blob([json], { type: 'application/json' });
+      if (!('sendBeacon' in navigator) || !navigator.sendBeacon('/webapp-answer', blob)) {
         alert('Не удалось отправить данные. Проверьте сеть и попробуйте ещё раз.');
-        throw err;
+        throw new Error('send inline result failed');
       }
     }
   }
 
-  // Далее / Подтвердить
   nextBtn.addEventListener("click", async () => {
     if (currentStep === 1 && !data.plan) {
       alert("Пожалуйста, выберите вариант на первом шаге");
@@ -102,17 +94,15 @@ document.addEventListener("DOMContentLoaded", () => {
       currentStep++;
       showStep(currentStep);
     } else {
-      // подтверждение → отправляем на сервер query_id + данные
       try {
         await sendInlineResult(data);
         tg?.close();
       } catch (_) {
-        // не закрываем — пусть пользователь попробует снова
+        // не закрываем — пусть пользователь повторит
       }
     }
   });
 
-  // Назад
   backBtn.addEventListener("click", () => {
     if (currentStep > 1) {
       currentStep--;

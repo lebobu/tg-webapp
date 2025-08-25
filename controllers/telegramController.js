@@ -1,4 +1,5 @@
 // controllers/telegramController.js
+const chatStore = require('../chatStore');
 
 function escMd(s = '') {
   return String(s).replace(/([_*[\]()~`>#+\-=|{}.!])/g, '\\$1');
@@ -6,9 +7,12 @@ function escMd(s = '') {
 
 module.exports = (bot) => ({
 
-  // /start — показываем ИМЕННО inline_keyboard с web_app (для варианта B)
-  onStartCommand: (msg) => {
-    const url = process.env.SERVER_URL; // ваш публичный https хост, где открыт WebApp
+  // /start — inline-кнопка с web_app (вариант B)
+  onStartCommand: async (msg) => {
+    const url = process.env.SERVER_URL;
+    // сохраняем user_id → chat_id (полезно для последующей отправки обычного сообщения)
+    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (e) { console.warn('chatStore.set on /start failed:', e); }
+
     bot.sendMessage(
       msg.chat.id,
       'Откройте мини-приложение по кнопке ниже, пройдите мастер и подтвердите:',
@@ -16,19 +20,24 @@ module.exports = (bot) => ({
         reply_markup: {
           inline_keyboard: [[{
             text: 'Открыть каталог',
-            web_app: { url }     // ВАЖНО: inline-кнопка
+            web_app: { url }
           }]]
         }
       }
     );
   },
 
-  // /id — быстрый способ узнать chat_id
+  // общий listener — обновляем маппинг user→chat на любое сообщение
+  onAnyMessage: async (msg) => {
+    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (e) { /* no-op */ }
+  },
+
+  // /id — быстрый chat_id
   onIdCommand: (msg) => {
     bot.sendMessage(msg.chat.id, `Ваш chat_id: ${msg.chat.id}`);
   },
 
-  // Telegram webhook → прокидываем апдейты в node-telegram-bot-api
+  // вебхук ноды
   onWebhook: (req, res) => {
     try {
       bot.processUpdate(req.body);
@@ -39,7 +48,7 @@ module.exports = (bot) => ({
     }
   },
 
-  // Оставляем совместимость: если когда-то пошлёте данные через /data
+  // совместимость с вариантом fetch/beacon
   onWebAppData: async (req, res) => {
     try {
       const { user, initData, platform, form } = req.body || {};
@@ -65,13 +74,12 @@ module.exports = (bot) => ({
     }
   },
 
-  // НОВОЕ: обработчик варианта B — ответ через answerWebAppQuery по query_id
+  // ВАРИАНТ B: inline-кнопка → фронт шлёт query_id(+ from_id) → отвечаем в чат через answerWebAppQuery
   onWebAppAnswer: async (req, res) => {
     try {
-      const { query_id, data } = req.body || {};
+      const { query_id, from_id, data } = req.body || {};
       if (!query_id) return res.status(400).json({ ok: false, error: 'no query_id' });
 
-      // ожидаем структуру { plan, accounts, duration } из wizard.js
       const plan     = data?.plan ?? '-';
       const accounts = data?.accounts ?? '-';
       const duration = data?.duration ?? '-';
@@ -83,16 +91,27 @@ module.exports = (bot) => ({
         `• *Срок:* ${escMd(duration)} мес.`,
       ].join('\n');
 
-      // Ответ пользователю: сообщение появится В ЧАТЕ, где нажали inline-кнопку
+      // 1) обязательный ответ на inline-запрос
       await bot.answerWebAppQuery(query_id, {
         type: 'article',
         id: String(Date.now()),
         title: 'Заявка подтверждена',
-        input_message_content: {
-          message_text: text,
-          parse_mode: 'Markdown'
-        }
+        input_message_content: { message_text: text, parse_mode: 'Markdown' }
       });
+
+      // 2) ДОПОЛНИТЕЛЬНО: обычное сообщение в чат (если знаем chat_id)
+      if (from_id) {
+        try {
+          const chatId = await chatStore.get(from_id);
+          if (chatId) {
+            await bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
+          } else {
+            console.warn('No chatId found for from_id:', from_id);
+          }
+        } catch (e) {
+          console.warn('sendMessage fallback failed:', e);
+        }
+      }
 
       res.json({ ok: true });
     } catch (e) {
