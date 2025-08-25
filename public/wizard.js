@@ -99,14 +99,13 @@ document.addEventListener("DOMContentLoaded", () => {
       <div style="color:#b00">Для расчёта цены укажите все параметры.</div>
     `;
   */
-
-        const priceBlock = p ? `
+ const priceBlock = p ? `
       <hr style="opacity:.15">
       <div style="font:600 16px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
         Итого: ${formatMoney(p.total)}
       </div>
-    ` : ""}
-    ` : `;
+        ` : `
+        `;
 
     if (summaryEl) {
       summaryEl.innerHTML = `
