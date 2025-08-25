@@ -43,8 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const disc = Number(cfg.durationDiscount?.[String(duration)] || 0); // 0..1
     const monthlyAfter = Math.round(baseMonthly * (1 - disc));
     const months = Number(duration);
-    const total = monthlyAfter * months;
-    const baseTotal = Math.round((baseMonthly * months*((100-disc)*0.01)));
+    // const total = monthlyAfter * months;
+    const total = Math.round((baseMonthly * months*((100-disc)*0.01)));
+    const baseTotal = 0;
     // const baseTotal = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
     const savings = baseTotal - total;
 
