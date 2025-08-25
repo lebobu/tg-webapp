@@ -92,12 +92,12 @@ module.exports = (bot) => ({
       ].join('\n');
 
       // 1) обязательный ответ на inline-запрос
-      await bot.answerWebAppQuery(query_id, {
-        type: 'article',
-        id: String(Date.now()),
-        title: 'Заявка подтверждена',
-        input_message_content: { message_text: text, parse_mode: 'Markdown' }
-      });
+      // await bot.answerWebAppQuery(query_id, {
+      //   type: 'article',
+      //   id: String(Date.now()),
+      //   title: 'Заявка подтверждена',
+      //   input_message_content: { message_text: text, parse_mode: 'Markdown' }
+      // });
 
       // 2) ДОПОЛНИТЕЛЬНО: обычное сообщение в чат (если знаем chat_id)
       if (from_id) {
