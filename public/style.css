@@ -12,7 +12,6 @@ h2 {
 }
 
 .cart {
-  font-size: 1.5rem;
   text-align: right;
   margin-bottom: 10px;
 }
@@ -110,6 +109,7 @@ h2 {
   justify-content:space-between; /* 1-й влево, 2-й вправо */
   gap:12px;
   margin:12px 0;
+  background: #0088cc;
 }
 
 .price-pill {
@@ -117,7 +117,6 @@ h2 {
     margin: 12px 0 0;
     padding: 10px 14px;
     border-radius: 12px;
-    background: #0088cc;
   }
 
   .price-pill.show { display: inline-block; }

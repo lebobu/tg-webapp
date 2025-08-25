@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const discText = p.discount ? `, скидка ${Math.round(p.discount * 100)}%` : "";
     if (pricePreview) {
       pricePreview.innerHTML =
-        `<br>Итого за ${p.months} мес: <b>${formatMoney(p.total)}</b>`; 
+        `Итого за ${p.months} мес: <b>${formatMoney(p.total)}</b>`; 
         // + (p.savings > 0 ? ` <small>(Вы экономите ${formatMoney(p.savings)})</small>` : "")
       pricePreview.classList.add("show");
     }
