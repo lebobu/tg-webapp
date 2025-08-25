@@ -104,6 +104,14 @@ h2 {
   align-items: center;
 }
 
+.price-and-cart{
+  display:flex;
+  align-items:center;
+  justify-content:space-between; /* 1-й влево, 2-й вправо */
+  gap:12px;
+  margin:12px 0;
+}
+
 .price-pill {
     display: none;
     margin: 12px 0 0;

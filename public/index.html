@@ -13,11 +13,16 @@
   <!-- <script defer src="script.js"></script> -->
 </head>
 <body>
-  <!-- Блок предпросмотра цены -->
+  <div class="price-and-cart">
+<!-- Блок предпросмотра цены -->
   <div id="pricePreview" class="price-pill" aria-live="polite"></div>
-  <div class="cart">🛒<sup id="cart-count">0</sup></div>
+  <!-- Значок корзины -->
+  <button class="cart" type="button" aria-label="Корзина">
+    🛒<sup id="cart-count">0</sup>
+  </button>
+</div>
 
-  <!-- Шаг 1 -->
+<!-- Шаг 1 -->
   <div class="step step-1">
     <p><strong>Шаг 1/3: Выберите подписку</strong></p>
     <div class="buttons">
