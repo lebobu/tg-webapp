@@ -11,12 +11,6 @@ h2 {
   margin-bottom: 20px;
 }
 
-.cart {
-  font-size: 1.5rem;
-  text-align: right;
-  margin-bottom: 10px;
-}
-
 .buttons {
   display: flex;
   flex-wrap: wrap;
@@ -107,14 +101,14 @@ h2 {
 .price-and-cart{
   display:flex;
   align-items:center;
-  justify-content:space-between; /* 1-й влево, 2-й вправо */
+  /* justify-content:space-between; 1-й влево, 2-й вправо */
   gap:12px;
-  margin:5px 0;
+  /* margin:5px 0; */
 }
 
 .price-pill {
     display: none;
-    margin: 12px 0 0;
+    /* margin: 12px 0 0; */
     padding: 5px 10px;
     border-radius: 12px;
     background: #0088cc;
@@ -123,3 +117,11 @@ h2 {
   .price-pill.show { display: inline-block; }
 
   .price-pill small { font-weight: 500; opacity: .7; margin-left: 6px; }
+
+  .cart {
+  margin-left:auto;  
+  font-size: 1.5rem;
+  text-align: right;
+  margin-bottom: 10px;
+  background: #0860b8;
+}
