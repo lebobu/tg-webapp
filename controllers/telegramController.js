@@ -12,11 +12,11 @@ function buildPriceLines(pricing) {
     `• *Итого:* ${escMd(pricing.total)}`,
     // `• *Ежемесячно:* ${escMd(pricing.monthlyAfter)}`
   ];
-  const extras = [];
+/*   const extras = [];
   if (pricing.baseMonthly !== undefined) extras.push(`база ${pricing.baseMonthly}`);
   if (pricing.discount !== undefined)     extras.push(`скидка ${pricing.discount}`);
   if (extras.length) lines[1] += ` _(${escMd(extras.join(', '))})_`;
-  return lines;
+ */  return lines;
 }
 
 module.exports = (bot) => ({

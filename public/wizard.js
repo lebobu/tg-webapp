@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthlyAfter = Math.round(baseMonthly * (1 - disc));
     const months = Number(duration);
     // const total = monthlyAfter * months;
-    const total = Math.round((baseMonthly * months*((100-disc)*0.01)));
+    const total = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
     const baseTotal = 0;
     // const baseTotal = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
     const savings = baseTotal - total;
@@ -83,11 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const accountsLabel = data.accounts || "-";
     const durationLabel = data.duration || "-";
 
+    /*
     const priceBlock = p ? `
       <hr style="opacity:.15">
       <div style="font:600 16px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
         Итого: ${formatMoney(p.total)}
       </div>
+      
       <div style="opacity:.7; font: 13px/1.35 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
         ${formatMoney(p.monthlyAfter)} / мес
         ${p.discount ? `(скидка ${Math.round(p.discount*100)}%, база ${formatMoney(p.baseMonthly)})` : ""}
@@ -95,6 +97,14 @@ document.addEventListener("DOMContentLoaded", () => {
       ${p.savings > 0 ? `<div style="opacity:.7; font: 13px/1.35 system-ui">Экономия: ${formatMoney(p.savings)}</div>` : ""}
     ` : `
       <div style="color:#b00">Для расчёта цены укажите все параметры.</div>
+    `;
+  */
+
+        const priceBlock = p ? `
+      <hr style="opacity:.15">
+      <div style="font:600 16px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+        Итого: ${formatMoney(p.total)}
+      </div>
     `;
 
     if (summaryEl) {
