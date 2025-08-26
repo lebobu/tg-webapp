@@ -9,7 +9,8 @@ Both steps are executed in run.sh via ./run.sh
 # Logic
 # Structure ready
 
-# fix worked version 25-08
+# fix worked version 25-08 
+#
 node -v
 v18.20.8
 npm -v
