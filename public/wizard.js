@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const baseMonthly = cfg.matrix?.[plan]?.[String(accounts)];
     if (!Number.isFinite(baseMonthly)) return null;
 
-    const disc = Number(cfg.durationDiscount?.[String(duration)] || 0); // 0..1
+    const disc = Number(cfg.durationDiscount?.[String(duration)] || 1); // 0..1
     const monthlyAfter = Math.round(baseMonthly * (1 - disc));
     const months = Number(duration);
     // const total = monthlyAfter * months;
