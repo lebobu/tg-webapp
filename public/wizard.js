@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthlyAfter = Math.round(baseMonthly * (1 - disc));
     const months = Number(duration);
     // const total = monthlyAfter * months;
-    const total = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
+    const total = 12345;
+    // const total = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
     const baseTotal = 99999;
     // const baseTotal = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
     const savings = baseTotal - total;
@@ -68,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (pricePreview) pricePreview.textContent = "";
       return;
     }
+
     const discText = p.discount ? `, скидка ${Math.round(p.discount * 100)}%` : "";
     if (pricePreview) {
       pricePreview.innerHTML =
@@ -75,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // + (p.savings > 0 ? ` <small>(Вы экономите ${formatMoney(p.savings)})</small>` : "")
       pricePreview.classList.add("show");
     }
+    
   }
 
   function renderSummary() {
