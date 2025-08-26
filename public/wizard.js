@@ -37,16 +37,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function computePrice(plan, accounts, duration) {
     if (!plan || !accounts || !duration) return null;
-    // const baseMonthly = cfg.matrix?.[plan]?.[String(accounts)];
-    const baseMonthly = Number(cfg.matrix?.[plan]?.[String(accounts)]);
+    const baseMonthly = cfg.matrix?.[plan]?.[String(accounts)];
     if (!Number.isFinite(baseMonthly)) return null;
 
     const disc = Number(cfg.durationDiscount?.[String(duration)] || 0); // 0..1
     const monthlyAfter = Math.round(baseMonthly * (1 - disc));
     const months = Number(duration);
     // const total = monthlyAfter * months;
-    // const total = disc;
-    const total = Math.round(10/(baseMonthly * months * ((100-disc)*0.01))) * 10;
+    // const total = Math.round(10/(baseMonthly * months * ((100-disc) * 0.01))) * 10;
+    const total = baseMonthly * months * ((100-disc) * 0.01);
     const baseTotal = 99999;
     // const baseTotal = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
     const savings = baseTotal - total;
