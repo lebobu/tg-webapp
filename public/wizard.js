@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ПОМОЩНИКИ: где «аккаунты» и где «срок» на шаге 2
   // Если есть явные контейнеры — используем их, иначе fallback по кнопкам.
+  const accountsLabel =
+  document.querySelector('.step-2 .accounts-label') || null;
+
   const accountsGroup =
     document.querySelector("#accountsGroup") ||
     document.querySelector(".row-accounts") ||
@@ -127,12 +130,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // На шаге 2 — показать/скрыть группу АККАУНТОВ для спец-планов
     if (step === 2) {
-      const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
-      if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
-      // На всякий случай скрыть/показать отдельные кнопки аккаунтов
-      document.querySelectorAll('.step-2 .btn.option[data-accounts]')
-        .forEach(b => b.classList.toggle('hidden', hideAccounts));
-    }
+  const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
+  if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
+  if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
+  document.querySelectorAll('.step-2 .btn.option[data-accounts]')
+    .forEach(b => b.classList.toggle('hidden', hideAccounts));
+}
+
 
     if (step < totalSteps) renderPreview();
     if (step === totalSteps) renderSummary();
@@ -162,11 +166,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Если мы на шаге 2 — сразу обновим видимость блока аккаунтов
       if (currentStep === 2) {
-        const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
-        if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
-        document.querySelectorAll('.step-2 .btn.option[data-accounts]')
-          .forEach(b => b.classList.toggle('hidden', hideAccounts));
-      }
+  const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
+  if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
+  if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
+  document.querySelectorAll('.step-2 .btn.option[data-accounts]')
+    .forEach(b => b.classList.toggle('hidden', hideAccounts));
+  }
+
 
       renderPreview();
     });
