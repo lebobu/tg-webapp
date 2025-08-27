@@ -17,13 +17,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("next");
   const summaryEl = document.getElementById("summary");
 
+  const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
+
   // ---------- utils ----------
   function formatMoney(n) {
     const ds = fmtCfg.decimalSep ?? ",";
     const ts = fmtCfg.thousandSep ?? " ";
     const fd = Number.isFinite(fmtCfg.fractionDigits) ? fmtCfg.fractionDigits : 0;
     const sign = n < 0 ? "-" : "";
-    n = Math.abs(n);
+    n = Math.abs(Number(n));
 
     const int = Math.trunc(n);
     const frac = Math.round((n - int) * Math.pow(10, fd));
@@ -35,79 +37,54 @@ document.addEventListener("DOMContentLoaded", () => {
       : `${sign}${intStr}${fracStr} ${cur}`;
   }
 
-  function computePrice(plan, accounts, duration) {
-    if (!plan || !accounts || !duration) return null;
-    const baseMonthly = cfg.matrix?.[plan]?.[String(accounts)];
-    if (!Number.isFinite(baseMonthly)) return null;
+  // Берём ИТОГ непосредственно из PRICING.matrixTotals
+  function computeTotal(plan, accounts, duration) {
+    if (!plan) return null;
+    const table = cfg.matrixTotals?.[plan];
+    if (!table) return null;
 
-    const disc = Number(cfg.durationDiscount?.[String(duration)] || 0); // 0..1
-    const monthlyAfter = Math.round(baseMonthly * (1 - disc));
-    const months = Number(duration);
-    // const total = monthlyAfter * months;
-    const total = Math.round((baseMonthly * months * ((100-disc) * 0.01))/50) * 50;
-    const baseTotal = 99999;
-    // const baseTotal = Math.round(10/(baseMonthly * months*((100-disc)*0.01))) * 10;
-    const savings = baseTotal - total;
+    // Фиксированная цена для спец-планов
+    if (table && typeof table.total !== "undefined") {
+      return { total: Number(table.total), months: null, currency: cfg.currency || "₽" };
+    }
 
-    return {
-      currency: cfg.currency || "₽",
-      baseMonthly,
-      monthlyAfter,
-      discount: disc,       // 20%
-      months,
-      total,
-      baseTotal,
-      savings
-    };
+    // Обычные планы — нужна комбинация accounts + duration
+    if (!accounts || !duration) return null;
+    const byAcc = table[String(accounts)];
+    if (!byAcc) return null;
+    const total = byAcc[String(duration)];
+    if (!Number.isFinite(total)) return null;
+
+    return { total: Number(total), months: Number(duration), currency: cfg.currency || "₽" };
   }
 
   function renderPreview() {
-    const p = computePrice(data.plan, data.accounts, data.duration);
+    const p = computeTotal(data.plan, data.accounts, data.duration);
     if (!p) {
       pricePreview?.classList.remove("show");
       if (pricePreview) pricePreview.textContent = "";
       return;
     }
-
-    const discText = p.discount ? `, скидка ${Math.round(p.discount * 100)}%` : "";
     if (pricePreview) {
-      pricePreview.innerHTML =
-        `Итого за ${p.months} мес: <b>${formatMoney(p.total)}</b>`; 
-        // + (p.savings > 0 ? ` <small>(Вы экономите ${formatMoney(p.savings)})</small>` : "")
+      // только ИТОГО (без скидок/месячных)
+      const suffix = p.months ? ` за ${p.months} мес` : "";
+      pricePreview.innerHTML = `Итого${suffix}: <b>${formatMoney(p.total)}</b>`;
       pricePreview.classList.add("show");
     }
-    
   }
 
   function renderSummary() {
-    const p = computePrice(data.plan, data.accounts, data.duration);
+    const p = computeTotal(data.plan, data.accounts, data.duration);
     const planLabel     = data.plan     || "-";
-    const accountsLabel = data.accounts || "-";
-    const durationLabel = data.duration || "-";
+    const accountsLabel = data.accounts || (SPECIAL_PLANS.has(planLabel) ? "—" : "-");
+    const durationLabel = data.duration || (SPECIAL_PLANS.has(planLabel) ? "—" : "-");
 
-    /*
     const priceBlock = p ? `
       <hr style="opacity:.15">
       <div style="font:600 16px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
         Итого: ${formatMoney(p.total)}
       </div>
-      
-      <div style="opacity:.7; font: 13px/1.35 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
-        ${formatMoney(p.monthlyAfter)} / мес
-        ${p.discount ? `(скидка ${Math.round(p.discount*100)}%, база ${formatMoney(p.baseMonthly)})` : ""}
-      </div>
-      ${p.savings > 0 ? `<div style="opacity:.7; font: 13px/1.35 system-ui">Экономия: ${formatMoney(p.savings)}</div>` : ""}
-    ` : `
-      <div style="color:#b00">Для расчёта цены укажите все параметры.</div>
-    `;
-  */
- const priceBlock = p ? `
-      <hr style="opacity:.15">
-      <div style="font:600 16px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
-        Итого: ${formatMoney(p.total)}
-      </div>
-        ` : `
-        `;
+    ` : ``;
 
     if (summaryEl) {
       summaryEl.innerHTML = `
@@ -115,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <ul style="list-style-type:none; padding:0; margin:0 0 10px 0;">
           <li>Тариф: <b>${planLabel}</b></li>
           <li>Аккаунтов: <b>${accountsLabel}</b></li>
-          <li>Срок: <b>${durationLabel}</b> мес.</li>
+          <li>Срок: <b>${durationLabel}</b></li>
         </ul>
         ${priceBlock}
       `;
@@ -128,52 +105,74 @@ document.addEventListener("DOMContentLoaded", () => {
     if (backBtn) backBtn.style.display = step === 1 ? "none" : "inline-block";
     if (nextBtn) nextBtn.textContent = step === totalSteps ? "Подтвердить" : "Далее";
 
-    if (step < totalSteps) renderPreview();   // на шагах выбора — лишь превью
-    if (step === totalSteps) renderSummary(); // финальный шаг — детальный итог
+    if (step < totalSteps) renderPreview();
+    if (step === totalSteps) renderSummary();
   }
 
   // ---------- выбор опций ----------
   document.querySelectorAll(".btn.option").forEach((btn) => {
     btn.addEventListener("click", (e) => {
+      e.preventDefault();
       const t = e.currentTarget;
       const { plan, accounts, duration } = t.dataset;
 
-      // эксклюзивный выбор в рамках контейнера
+      // эксклюзивный выбор в рамках контейнера кнопок
       const group = t.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
       t.classList.add("selected");
 
-      if (plan)     data.plan = plan;               // ключ из data-plan (д.б. как в PRICING.matrix)
-      if (accounts) data.accounts = accounts;       // строка/число — ок
+      if (plan) {
+        data.plan = plan;
+
+        // Спец-планы: сразу на Шаг 3 (без выбора аккаунтов/срока)
+        if (SPECIAL_PLANS.has(plan)) {
+          delete data.accounts;
+          delete data.duration;
+          currentStep = 3;
+          showStep(currentStep);
+          renderPreview(); // уже покажем ИТОГО
+          return;
+        }
+      }
+      if (accounts) data.accounts = accounts;
       if (duration) data.duration = Number(duration);
 
       renderPreview();
     });
   });
 
-  // ---------- кнопки шага ----------
-  nextBtn?.addEventListener("click", async () => {
-    if (currentStep === 1 && !data.plan) {
-      alert("Пожалуйста, выберите тариф");
-      return;
+  // ---------- кнопки навигации ----------
+  nextBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    if (currentStep === 1) {
+      if (!data.plan) {
+        alert("Пожалуйста, выберите тариф");
+        return;
+      }
+      // Если выбран спец-план, мы уже перепрыгнули на шаг 3 в обработчике клика.
     }
-    if (currentStep === 2 && (!data.accounts || !data.duration)) {
-      alert("Пожалуйста, выберите количество аккаунтов и срок");
-      return;
+
+    if (currentStep === 2) {
+      if (!data.accounts || !data.duration) {
+        alert("Пожалуйста, выберите количество аккаунтов и срок");
+        return;
+      }
     }
 
     if (currentStep < totalSteps) {
       currentStep++;
       showStep(currentStep);
     } else {
-      // подтверждение → отправка (вариант B: inline + answerWebAppQuery)
-      const pricing = computePrice(data.plan, data.accounts, data.duration);
-      const payload = { ...data, pricing }; // добавляем цены в полезную нагрузку
+      // подтверждение → отправка (inline + answerWebAppQuery)
+      const pricing = computeTotal(data.plan, data.accounts, data.duration);
+      const payload = { ...data, pricing };
 
       const qid = tg?.initDataUnsafe?.query_id;
       const fromId = tg?.initDataUnsafe?.user?.id;
+
       if (!qid) {
-        // fallback: если вдруг запустили не из inline-кнопки — sendData
+        // fallback: если вдруг запустили не из inline-кнопки
         try { tg?.sendData(JSON.stringify(payload)); } catch (_) {}
         tg?.close();
         return;
@@ -195,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         tg?.close();
       } catch {
-        // фолбэк — sendBeacon
         const blob = new Blob([json], { type: 'application/json' });
         if (!('sendBeacon' in navigator) || !navigator.sendBeacon('/webapp-answer', blob)) {
           alert('Не удалось отправить данные. Проверьте сеть и попробуйте ещё раз.');
@@ -206,7 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  backBtn?.addEventListener("click", () => {
+  backBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
     if (currentStep > 1) {
       currentStep--;
       showStep(currentStep);
@@ -215,3 +214,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   showStep(currentStep);
 });
+
