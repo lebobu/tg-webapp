@@ -17,10 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("next");
   const summaryEl = document.getElementById("summary");
 
-  // ПОМОЩНИКИ: где «аккаунты» и где «срок» на шаге 2
-  // Если есть явные контейнеры — используем их, иначе fallback по кнопкам.
+  // Узлы шага 2
   const accountsLabel =
-  document.querySelector('.step-2 .accounts-label') || null;
+    document.querySelector('.step-2 .accounts-label') || null;
 
   const accountsGroup =
     document.querySelector("#accountsGroup") ||
@@ -122,6 +121,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Сброс выбора ШАГА 2 (только при переходе 1 -> 2)
+  function resetStep2Selections() {
+    delete data.accounts;
+    delete data.duration;
+
+    // убрать выделение кнопок на шаге 2
+    document.querySelectorAll('.step-2 .btn.option.selected')
+      .forEach(el => el.classList.remove('selected'));
+
+    // спрятать превью цены
+    if (pricePreview) {
+      pricePreview.classList.remove('show');
+      pricePreview.textContent = '';
+    }
+  }
+
   function showStep(step) {
     steps.forEach((el, idx) => { el.style.display = idx === step - 1 ? "block" : "none"; });
     if (progressBar) progressBar.style.width = `${(step / totalSteps) * 100}%`;
@@ -130,13 +145,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // На шаге 2 — показать/скрыть группу АККАУНТОВ для спец-планов
     if (step === 2) {
-  const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
-  if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
-  if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
-  document.querySelectorAll('.step-2 .btn.option[data-accounts]')
-    .forEach(b => b.classList.toggle('hidden', hideAccounts));
-}
-
+      const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
+      if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
+      if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
+      document.querySelectorAll('.step-2 .btn.option[data-accounts]')
+        .forEach(b => b.classList.toggle('hidden', hideAccounts));
+    }
 
     if (step < totalSteps) renderPreview();
     if (step === totalSteps) renderSummary();
@@ -156,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (plan) {
         data.plan = plan;
-        // При смене плана чистим выбор аккаунтов, если он не нужен
+        // если выбран спец-план — аккаунты не нужны
         if (SPECIAL_PLANS.has(plan)) {
           delete data.accounts;
         }
@@ -164,15 +178,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (accounts) data.accounts = accounts;
       if (duration) data.duration = Number(duration);
 
-      // Если мы на шаге 2 — сразу обновим видимость блока аккаунтов
+      // если уже на шаге 2 — просто обновим видимость блока аккаунтов
       if (currentStep === 2) {
-  const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
-  if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
-  if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
-  document.querySelectorAll('.step-2 .btn.option[data-accounts]')
-    .forEach(b => b.classList.toggle('hidden', hideAccounts));
-  }
-
+        const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
+        if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
+        if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
+        document.querySelectorAll('.step-2 .btn.option[data-accounts]')
+          .forEach(b => b.classList.toggle('hidden', hideAccounts));
+      }
 
       renderPreview();
     });
@@ -184,6 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentStep === 1) {
       if (!data.plan) return alert("Пожалуйста, выберите тариф");
+      // Переход 1 -> 2: сбрасываем выбор второго шага
+      resetStep2Selections();
     }
 
     if (currentStep === 2) {
