@@ -128,3 +128,5 @@ h2 {
   text-align: right;
   margin-bottom: 10px;
   }
+  
+  .hidden { display: none !important; }

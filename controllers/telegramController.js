@@ -88,6 +88,7 @@ module.exports = (bot) => ({
       const { query_id, from_id, data } = req.body || {};
       if (!query_id) return res.status(400).json({ ok: false, error: 'no query_id' });
 
+      const SPECIAL_PLANS = new Set(['Роутер','Сервер VPS']);
       const plan     = data?.plan ?? '-';
       const accounts = data?.accounts ?? '-';
       const duration = data?.duration ?? '-';
@@ -96,7 +97,8 @@ module.exports = (bot) => ({
       const baseLines = [
         '✅ *Заявка подтверждена*',
         `• *Тариф:* ${escMd(plan)}`,
-        `• *Аккаунтов:* ${escMd(accounts)}`,
+         // показываем "Аккаунтов" только если НЕ спец-план
+        ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
         `• *Срок:* ${escMd(duration)} мес.`
       ];
       const priceLines = buildPriceLines(pricing); // без форматирования и экономии

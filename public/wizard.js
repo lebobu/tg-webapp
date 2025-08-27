@@ -17,6 +17,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("next");
   const summaryEl = document.getElementById("summary");
 
+  // ПОМОЩНИКИ: где «аккаунты» и где «срок» на шаге 2
+  // Если есть явные контейнеры — используем их, иначе fallback по кнопкам.
+  const accountsGroup =
+    document.querySelector("#accountsGroup") ||
+    document.querySelector(".row-accounts") ||
+    document.querySelector(".accounts") ||
+    document.querySelector('.step-2 [data-group="accounts"]') || null;
+
+  const durationGroup =
+    document.querySelector("#durationGroup") ||
+    document.querySelector(".row-duration") ||
+    document.querySelector(".duration") ||
+    document.querySelector('.step-2 [data-group="duration"]') || null;
+
   const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
 
   // ---------- utils ----------
@@ -37,18 +51,21 @@ document.addEventListener("DOMContentLoaded", () => {
       : `${sign}${intStr}${fracStr} ${cur}`;
   }
 
-  // Берём ИТОГ непосредственно из PRICING.matrixTotals
+  // Итог из матрицы (без формул):
+  // - EU/RU: totals[plan][accounts][duration]
+  // - Роутер/VPS: totals[plan].durations[duration]
   function computeTotal(plan, accounts, duration) {
     if (!plan) return null;
     const table = cfg.matrixTotals?.[plan];
     if (!table) return null;
 
-    // Фиксированная цена для спец-планов
-    if (table && typeof table.total !== "undefined") {
-      return { total: Number(table.total), months: null, currency: cfg.currency || "₽" };
+    if (SPECIAL_PLANS.has(plan)) {
+      if (!duration) return null;
+      const total = table.durations?.[String(duration)];
+      if (!Number.isFinite(total)) return null;
+      return { total: Number(total), months: Number(duration), currency: cfg.currency || "₽" };
     }
 
-    // Обычные планы — нужна комбинация accounts + duration
     if (!accounts || !duration) return null;
     const byAcc = table[String(accounts)];
     if (!byAcc) return null;
@@ -66,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     if (pricePreview) {
-      // только ИТОГО (без скидок/месячных)
       const suffix = p.months ? ` за ${p.months} мес` : "";
       pricePreview.innerHTML = `Итого${suffix}: <b>${formatMoney(p.total)}</b>`;
       pricePreview.classList.add("show");
@@ -75,9 +91,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderSummary() {
     const p = computeTotal(data.plan, data.accounts, data.duration);
-    const planLabel     = data.plan     || "-";
-    const accountsLabel = data.accounts || (SPECIAL_PLANS.has(planLabel) ? "—" : "-");
-    const durationLabel = data.duration || (SPECIAL_PLANS.has(planLabel) ? "—" : "-");
+    const planLabel     = data.plan || "-";
+    const durationLabel = data.duration || "-";
+
+    // Аккаунты показываем только для НЕ спец-планов
+    const accountsLine = SPECIAL_PLANS.has(planLabel)
+      ? ""
+      : `<li>Аккаунтов: <b>${data.accounts || "-"}</b></li>`;
 
     const priceBlock = p ? `
       <hr style="opacity:.15">
@@ -91,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <p><strong>Вы выбрали:</strong></p>
         <ul style="list-style-type:none; padding:0; margin:0 0 10px 0;">
           <li>Тариф: <b>${planLabel}</b></li>
-          <li>Аккаунтов: <b>${accountsLabel}</b></li>
+          ${accountsLine}
           <li>Срок: <b>${durationLabel}</b></li>
         </ul>
         ${priceBlock}
@@ -105,6 +125,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (backBtn) backBtn.style.display = step === 1 ? "none" : "inline-block";
     if (nextBtn) nextBtn.textContent = step === totalSteps ? "Подтвердить" : "Далее";
 
+    // На шаге 2 — показать/скрыть группу АККАУНТОВ для спец-планов
+    if (step === 2) {
+      const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
+      if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
+      // На всякий случай скрыть/показать отдельные кнопки аккаунтов
+      document.querySelectorAll('.step-2 .btn.option[data-accounts]')
+        .forEach(b => b.classList.toggle('hidden', hideAccounts));
+    }
+
     if (step < totalSteps) renderPreview();
     if (step === totalSteps) renderSummary();
   }
@@ -116,26 +145,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const t = e.currentTarget;
       const { plan, accounts, duration } = t.dataset;
 
-      // эксклюзивный выбор в рамках контейнера кнопок
+      // эксклюзивный выбор в рамках контейнера
       const group = t.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
       t.classList.add("selected");
 
       if (plan) {
         data.plan = plan;
-
-        // Спец-планы: сразу на Шаг 3 (без выбора аккаунтов/срока)
+        // При смене плана чистим выбор аккаунтов, если он не нужен
         if (SPECIAL_PLANS.has(plan)) {
           delete data.accounts;
-          delete data.duration;
-          currentStep = 3;
-          showStep(currentStep);
-          renderPreview(); // уже покажем ИТОГО
-          return;
         }
       }
       if (accounts) data.accounts = accounts;
       if (duration) data.duration = Number(duration);
+
+      // Если мы на шаге 2 — сразу обновим видимость блока аккаунтов
+      if (currentStep === 2) {
+        const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
+        if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
+        document.querySelectorAll('.step-2 .btn.option[data-accounts]')
+          .forEach(b => b.classList.toggle('hidden', hideAccounts));
+      }
 
       renderPreview();
     });
@@ -146,17 +177,16 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     if (currentStep === 1) {
-      if (!data.plan) {
-        alert("Пожалуйста, выберите тариф");
-        return;
-      }
-      // Если выбран спец-план, мы уже перепрыгнули на шаг 3 в обработчике клика.
+      if (!data.plan) return alert("Пожалуйста, выберите тариф");
     }
 
     if (currentStep === 2) {
-      if (!data.accounts || !data.duration) {
-        alert("Пожалуйста, выберите количество аккаунтов и срок");
-        return;
+      if (SPECIAL_PLANS.has(data.plan || "")) {
+        if (!data.duration) return alert("Пожалуйста, выберите срок");
+      } else {
+        if (!data.accounts || !data.duration) {
+          return alert("Пожалуйста, выберите количество аккаунтов и срок");
+        }
       }
     }
 
@@ -170,9 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const qid = tg?.initDataUnsafe?.query_id;
       const fromId = tg?.initDataUnsafe?.user?.id;
-
       if (!qid) {
-        // fallback: если вдруг запустили не из inline-кнопки
         try { tg?.sendData(JSON.stringify(payload)); } catch (_) {}
         tg?.close();
         return;
@@ -214,4 +242,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   showStep(currentStep);
 });
-
