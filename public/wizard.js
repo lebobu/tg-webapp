@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <li>Тариф: <b>${planLabel}</b></li>
           ${accountsLine}
           <li>Срок: <b>${durationLabel}</b></li>
-          ${emailLine}
+          <li>${emailLine}</b></li>
         </ul>
         ${priceBlock}
       `;
