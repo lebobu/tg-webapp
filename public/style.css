@@ -158,6 +158,13 @@ h2 {
   padding: 10px;
 }
 
+.email-error {
+  display: none;
+  color: #f3fc03;
+  margin-top: 6px;
+}
+
+
 .hidden {
   display: none !important;
 }
