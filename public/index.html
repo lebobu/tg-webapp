@@ -17,9 +17,9 @@
 <!-- Блок предпросмотра цены -->
   <div id="pricePreview" class="price-pill" aria-live="polite"></div>
   <!-- Значок корзины -->
-  <button class="cart" type="button" aria-label="Корзина">
+  <!-- <button class="cart" type="button" aria-label="Корзина">
     🛒<sup id="cart-count">0</sup>
-  </button>
+  </button> -->
 </div>
 
 <!-- Шаг 1 -->
@@ -54,6 +54,20 @@
   <div class="step step-3" style="display:none">
     <p><strong>Шаг 3/3: Подтверждение</strong></p>
     <div id="summary"></div>
+    <!-- Шаг 3: Email -->
+<div class="field" id="email-field" style="margin-top:12px">
+  <label for="email" class="email-label" style="display:block; font-weight:600; margin-bottom:6px;">
+    Заполните (проверьте) ваш адрес эл.почты
+  </label>
+  <input id="email"
+         type="email"
+         inputmode="email"
+         autocomplete="email"
+         placeholder="you@example.com"
+         required
+         style="width:100%; padding:10px 12px; border:1px solid #d0d0d4; border-radius:10px; font:14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;">
+  <small id="email-error" style="display:none; color:#c62828; margin-top:6px;">Введите корректный email</small>
+</div>
   </div>
 
   <!-- Прогресс-бар -->

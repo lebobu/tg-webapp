@@ -35,6 +35,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
 
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('email-error');
+
+  const isValidEmail = (s) => {
+    const v = String(s || '').trim();
+    // простой и надёжный для UI формат: "что-то@что-то.домен"
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  };
+
+
   // ---------- utils ----------
   function formatMoney(n) {
     const ds = fmtCfg.decimalSep ?? ",";
@@ -93,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderSummary() {
     const p = computeTotal(data.plan, data.accounts, data.duration);
-    const planLabel     = data.plan || "-";
+    const planLabel = data.plan || "-";
     const durationLabel = data.duration || "-";
 
     // Аккаунты показываем только для НЕ спец-планов
@@ -115,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <li>Тариф: <b>${planLabel}</b></li>
           ${accountsLine}
           <li>Срок: <b>${durationLabel}</b></li>
+          ${emailLine}
         </ul>
         ${priceBlock}
       `;
@@ -222,10 +233,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const qid = tg?.initDataUnsafe?.query_id;
       const fromId = tg?.initDataUnsafe?.user?.id;
       if (!qid) {
-        try { tg?.sendData(JSON.stringify(payload)); } catch (_) {}
+        try { tg?.sendData(JSON.stringify(payload)); } catch (_) { }
         tg?.close();
         return;
       }
+
+      // мы на шаге 3 — проверяем email
+      if (currentStep === totalSteps) {
+        const val = emailInput ? String(emailInput.value).trim() : '';
+        if (!isValidEmail(val)) {
+          if (emailError) emailError.style.display = 'block';
+          if (emailInput) {
+            emailInput.focus();
+            emailInput.style.borderColor = '#c62828';
+          }
+          return; // останавливаем отправку
+        }
+        // кладём email в данные заявки
+        data.email = val;
+      }
+
 
       const json = JSON.stringify({ query_id: qid, from_id: fromId, data: payload });
 
@@ -262,4 +289,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   showStep(currentStep);
+
+  // ⬇️ ДОБАВЬ ЭТОТ БЛОК СРАЗУ ПОСЛЕ showStep(...)
+  if (emailInput) {
+    emailInput.addEventListener('input', () => {
+      const ok = isValidEmail(emailInput.value);
+      emailInput.style.borderColor = ok ? '#d0d0d4' : '#c62828';
+      if (emailError) emailError.style.display = ok ? 'none' : 'block';
+    });
+  }
+
 });
