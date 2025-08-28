@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (emailError) emailError.style.display = 'block';
           if (emailInput) {
             emailInput.focus();
-            emailInput.style.borderColor = '#c62828';
+            emailInput.style.borderColor = '#f4f803ff';
           }
           return; // стоп подтверждение
         }
