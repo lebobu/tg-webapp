@@ -125,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <li>Тариф: <b>${planLabel}</b></li>
           ${accountsLine}
           <li>Срок: <b>${durationLabel}</b></li>
-          <li>${emailLine}</b></li>
         </ul>
         ${priceBlock}
       `;
@@ -226,18 +225,6 @@ document.addEventListener("DOMContentLoaded", () => {
       currentStep++;
       showStep(currentStep);
     } else {
-      // подтверждение → отправка (inline + answerWebAppQuery)
-      const pricing = computeTotal(data.plan, data.accounts, data.duration);
-      const payload = { ...data, pricing };
-
-      const qid = tg?.initDataUnsafe?.query_id;
-      const fromId = tg?.initDataUnsafe?.user?.id;
-      if (!qid) {
-        try { tg?.sendData(JSON.stringify(payload)); } catch (_) { }
-        tg?.close();
-        return;
-      }
-
       // мы на шаге 3 — проверяем e-mail
       if (currentStep === totalSteps) {
         const val = emailInput ? String(emailInput.value).trim() : '';
@@ -251,7 +238,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         data.email = val; // добавляем в данные заявки
       }
+      // подтверждение → отправка (inline + answerWebAppQuery)
+      const pricing = computeTotal(data.plan, data.accounts, data.duration);
+      const payload = { ...data, pricing };
 
+      const qid = tg?.initDataUnsafe?.query_id;
+      const fromId = tg?.initDataUnsafe?.user?.id;
+      if (!qid) {
+        try { tg?.sendData(JSON.stringify(payload)); } catch (_) { }
+        tg?.close();
+        return;
+      }
 
       const json = JSON.stringify({ query_id: qid, from_id: fromId, data: payload });
 
