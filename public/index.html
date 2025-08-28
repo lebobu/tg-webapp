@@ -51,18 +51,23 @@
   </div>
 
   <!-- Шаг 3 -->
-  <div class="step step-3" style="display:none">
-    <p><strong>Шаг 3/3: Подтверждение</strong></p>
+<div class="step step-3" style="display:none">
+  <p><strong>Шаг 3/3: Подтверждение</strong></p>
+
+  <div class="confirm-box">
     <div id="summary"></div>
+
     <!-- Шаг 3: Email (после summary) -->
     <div class="field" id="email-field" style="margin-top:12px">
       <label for="email" class="email-label" style="display:block; font-weight:600; margin-bottom:6px;">
         Заполните (проверьте) ваш адрес эл.почты
       </label>
-      <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required
+      <input id="email" class="email" type="email" inputmode="email" autocomplete="email"
+             placeholder="you@example.com" required>
       <small id="email-error" style="display:none; color:#f3fc03; margin-top:6px;">Введите корректный email</small>
     </div>
   </div>
+</div>
 
   <!-- Прогресс-бар -->
   <div class="progress">

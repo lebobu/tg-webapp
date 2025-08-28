@@ -82,6 +82,16 @@ h2 {
   }
 }
 
+/* общий контейнер шага подтверждения — центрируем и ограничиваем ширину */
+.confirm-box {
+  max-width: 560px;
+  /* подгоните под ваш вкус */
+  margin: 0 auto;
+  /* центр */
+  width: 100%;
+  box-sizing: border-box;
+}
+
 #summary {
   padding: 10px 10px;
   background-color: #0088cc;
@@ -135,12 +145,18 @@ h2 {
   margin-bottom: 10px;
 }
 
+/* input e-mail — на всю ширину контейнера */
 .email {
-  padding: 10px 12px;
-  border: 1px solid #d0d0d4;
-  border-radius: 10px;
-  min-width: 100px;
-  font: 14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#email-field {
+  /* можно добавить легкий фон/рамку, если нужно визуально совпасть */
+  background: #fff;
+  border: 1px solid #e6e8eb;
+  border-radius: 8px;
+  padding: 10px;
 }
 
 .hidden {
