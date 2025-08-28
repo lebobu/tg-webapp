@@ -93,13 +93,15 @@ module.exports = (bot) => ({
       const accounts = data?.accounts ?? '-';
       const duration = data?.duration ?? '-';
       const pricing  = data?.pricing; // ожидаем { total, monthlyAfter, baseMonthly, discount, ... }
+      const email    = data?.email ?? '-';
 
       const baseLines = [
         '✅ *Заявка подтверждена*',
         `• *Тариф:* ${escMd(plan)}`,
          // показываем "Аккаунтов" только если НЕ спец-план
         ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
-        `• *Срок:* ${escMd(duration)} мес.`
+        `• *Срок:* ${escMd(duration)} мес.`,
+        `• *Email:* ${escMd(email)}`
       ];
       const priceLines = buildPriceLines(pricing); // без форматирования и экономии
 

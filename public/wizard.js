@@ -238,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // мы на шаге 3 — проверяем email
+      // мы на шаге 3 — проверяем e-mail
       if (currentStep === totalSteps) {
         const val = emailInput ? String(emailInput.value).trim() : '';
         if (!isValidEmail(val)) {
@@ -247,10 +247,9 @@ document.addEventListener("DOMContentLoaded", () => {
             emailInput.focus();
             emailInput.style.borderColor = '#c62828';
           }
-          return; // останавливаем отправку
+          return; // стоп подтверждение
         }
-        // кладём email в данные заявки
-        data.email = val;
+        data.email = val; // добавляем в данные заявки
       }
 
 

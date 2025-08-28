@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,17 +13,18 @@
   <!-- Основной скрипт WebApp -->
   <!-- <script defer src="script.js"></script> -->
 </head>
+
 <body>
   <div class="price-and-cart">
-<!-- Блок предпросмотра цены -->
-  <div id="pricePreview" class="price-pill" aria-live="polite"></div>
-  <!-- Значок корзины -->
-  <!-- <button class="cart" type="button" aria-label="Корзина">
+    <!-- Блок предпросмотра цены -->
+    <div id="pricePreview" class="price-pill" aria-live="polite"></div>
+    <!-- Значок корзины -->
+    <!-- <button class="cart" type="button" aria-label="Корзина">
     🛒<sup id="cart-count">0</sup>
   </button> -->
-</div>
+  </div>
 
-<!-- Шаг 1 -->
+  <!-- Шаг 1 -->
   <div class="step step-1">
     <p><strong>Шаг 1/3: Выберите подписку</strong></p>
     <div class="buttons">
@@ -54,20 +56,15 @@
   <div class="step step-3" style="display:none">
     <p><strong>Шаг 3/3: Подтверждение</strong></p>
     <div id="summary"></div>
-    <!-- Шаг 3: Email -->
-<div class="field" id="email-field" style="margin-top:12px">
-  <label for="email" class="email-label" style="display:block; font-weight:600; margin-bottom:6px;">
-    Заполните (проверьте) ваш адрес эл.почты
-  </label>
-  <input id="email"
-         type="email"
-         inputmode="email"
-         autocomplete="email"
-         placeholder="you@example.com"
-         required
-         style="width:100%; padding:10px 12px; border:1px solid #d0d0d4; border-radius:10px; font:14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;">
-  <small id="email-error" style="display:none; color:#c62828; margin-top:6px;">Введите корректный email</small>
-</div>
+    <!-- Шаг 3: Email (после summary) -->
+    <div class="field" id="email-field" style="margin-top:12px">
+      <label for="email" class="email-label" style="display:block; font-weight:600; margin-bottom:6px;">
+        Заполните (проверьте) ваш адрес эл.почты
+      </label>
+      <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required
+        style="width:100%; padding:10px 12px; border:1px solid #d0d0d4; border-radius:10px; font:14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;">
+      <small id="email-error" style="display:none; color:#c62828; margin-top:6px;">Введите корректный email</small>
+    </div>
   </div>
 
   <!-- Прогресс-бар -->
@@ -81,29 +78,30 @@
     <a href="#" class="btn full" id="next">Далее</a>
   </div>
 
-<!-- 🔧 Ручная матрица ИТОГОВЫХ цен -->
-<script>
-  // Итоговые цены БЕЗ скидок/формул.
-  // EU/RU: matrixTotals[plan][accounts][duration] = TOTAL
-  // Роутер/Сервер VPS: matrixTotals[plan].durations[duration] = TOTAL
-  window.PRICING = {
-    currency: "₽",
-    display: { currencyPosition: "suffix", thousandSep: " ", decimalSep: ",", fractionDigits: 0 },
-    matrixTotals: {
-      "EU": {
-        "1": { "1": 120,  "3": 330,  "6": 650  },
-        "3": { "1": 330,  "3": 950,  "6": 1700 }
-      },
-      "RU": {
-        "1": { "1": 100,  "3": 280,  "6": 550  },
-        "3": { "1": 280,  "3": 800,  "6": 1500 }
-      },
-      "Роутер":     { durations: { "1": 450, "3": 1200, "6": 1800 } },
-      "Сервер VPS": { durations: { "1": 500, "3": 1400, "6": 2200 } }
-    }
-  };
-</script>
+  <!-- 🔧 Ручная матрица ИТОГОВЫХ цен -->
+  <script>
+    // Итоговые цены БЕЗ скидок/формул.
+    // EU/RU: matrixTotals[plan][accounts][duration] = TOTAL
+    // Роутер/Сервер VPS: matrixTotals[plan].durations[duration] = TOTAL
+    window.PRICING = {
+      currency: "₽",
+      display: { currencyPosition: "suffix", thousandSep: " ", decimalSep: ",", fractionDigits: 0 },
+      matrixTotals: {
+        "EU": {
+          "1": { "1": 120, "3": 330, "6": 650 },
+          "3": { "1": 330, "3": 950, "6": 1700 }
+        },
+        "RU": {
+          "1": { "1": 100, "3": 280, "6": 550 },
+          "3": { "1": 280, "3": 800, "6": 1500 }
+        },
+        "Роутер": { durations: { "1": 450, "3": 1200, "6": 1800 } },
+        "Сервер VPS": { durations: { "1": 500, "3": 1400, "6": 2200 } }
+      }
+    };
+  </script>
 
   <script src="wizard.js"></script>
 </body>
+
 </html>
