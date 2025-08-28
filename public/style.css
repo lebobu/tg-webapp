@@ -153,8 +153,7 @@ h2 {
 
 #email-field {
   /* можно добавить легкий фон/рамку, если нужно визуально совпасть */
-  background: #fff;
-  border: 1px solid #e6e8eb;
+  background: #0088cc;
   border-radius: 8px;
   padding: 10px;
 }
