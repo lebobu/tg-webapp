@@ -118,13 +118,13 @@ h2 {
 
   .price-pill small { font-weight: 500; opacity: .7; margin-left: 6px; }
 
-  .cart {
+  .bt-help {
   border: 0;
   background: transparent;
   appearance: none;
   -webkit-appearance: none;
   margin-left:auto;  
-  font-size: 1.5rem;
+  font-size: 2rem;
   text-align: right;
   margin-bottom: 10px;
   }
