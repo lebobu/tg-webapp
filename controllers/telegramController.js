@@ -27,7 +27,7 @@ module.exports = (bot) => ({
     try { await chatStore.set(msg.from.id, msg.chat.id); } catch (_) {}
     bot.sendMessage(
       msg.chat.id,
-      'Перейти для оформления заказа\nНажмите ❓ в каталоге, если возникают вопросы',
+      'Перейти для оформления заказа\nЕсть вопросы - Нажмите ❓ в каталоге',
       {
         reply_markup: {
           inline_keyboard: [[{ text: 'Открыть каталог', web_app: { url } }]]
