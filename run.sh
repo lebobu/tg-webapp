@@ -29,7 +29,7 @@ if ! [ -x "$PM2_BIN" ]; then
 fi
 
 # === настройки ===
-APP_DIR="/var/www/site-dev/run.sh"    # <— проверь свой фактический путь!
+APP_DIR="/var/www/site-dev"           # <— проверь свой фактический путь!
 APP_NAME="tg-webapp-bot-dev"          # <— имя процесса в PM2
 ENTRY="server.js"                     # точка входа
 
