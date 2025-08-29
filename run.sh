@@ -29,8 +29,8 @@ if ! [ -x "$PM2_BIN" ]; then
 fi
 
 # === настройки ===
-APP_DIR="/root/tg-webapp"   # <— проверь свой фактический путь!
-APP_NAME="tg-webapp-bot"               # <— имя процесса в PM2
+APP_DIR="/var/www/site-dev/run.sh"    # <— проверь свой фактический путь!
+APP_NAME="tg-webapp-bot-dev"          # <— имя процесса в PM2
 ENTRY="server.js"                     # точка входа
 
 # Защита от CRLF в .sh

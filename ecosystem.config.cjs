@@ -2,9 +2,9 @@
 module.exports = {
   apps: [
     {
-      name: "tg-webapp-bot",
+      name: "tg-webapp-dev-bot",
       script: "./server.js",
-      cwd: "/root/tg-webapp",
+      cwd: "/var/www/site-dev",
       watch: false, // or true if you want auto-reload on changes
       env: {
         NODE_ENV: "production"
@@ -12,3 +12,4 @@ module.exports = {
     }
   ]
 };
+
