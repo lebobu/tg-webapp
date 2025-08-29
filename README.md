@@ -11,6 +11,7 @@ Both steps are executed in run.sh via ./run.sh
 
 # fix worked version 28-08 + one more
 # check deploy
+# fix worked 29-08 with dev on port 3000
 
 node -v
 v18.20.8
