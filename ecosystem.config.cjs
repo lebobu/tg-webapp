@@ -7,7 +7,7 @@ module.exports = {
       cwd: "/var/www/site-dev",
       watch: false, // or true if you want auto-reload on changes
       env: {
-        NODE_ENV: "production"
+        NODE_ENV: "dev"
       }
     }
   ]
