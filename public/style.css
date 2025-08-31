@@ -56,10 +56,10 @@ h2 {
 }
 
 #back::before {
-  content: "««« ";
+  content: "<<< ";
 }
 #next::after {
-  content: " »»»";
+  content: " >>>";
 }
 
 .progress {
