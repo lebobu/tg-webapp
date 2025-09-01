@@ -296,3 +296,44 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+
+// --- Help modal logic ---
+const helpBtn   = document.querySelector('.bt-help');      // ваша кнопка "?"
+const helpModal = document.getElementById('help-modal');
+let _prevFocus = null;
+
+function openHelp(){
+  if (!helpModal) return;
+  _prevFocus = document.activeElement;
+  helpModal.classList.add('modal--open');
+  helpModal.removeAttribute('aria-hidden');
+  document.body.classList.add('no-scroll');
+  // Фокус на крестик
+  const closeBtn = helpModal.querySelector('[data-close]');
+  if (closeBtn) closeBtn.focus();
+}
+
+function closeHelp(){
+  if (!helpModal) return;
+  helpModal.classList.remove('modal--open');
+  helpModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('no-scroll');
+  // Вернуть фокус на кнопку
+  if (_prevFocus && typeof _prevFocus.focus === 'function') {
+    _prevFocus.focus();
+  }
+}
+
+// Открытие
+helpBtn?.addEventListener('click', openHelp);
+
+// Закрытие: по крестику, клику по фону, Esc
+helpModal?.addEventListener('click', (e) => {
+  if (e.target === helpModal) closeHelp();          // клик по подложке
+});
+helpModal?.querySelector('[data-close]')?.addEventListener('click', closeHelp);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && helpModal?.classList.contains('modal--open')) {
+    closeHelp();
+  }
+});

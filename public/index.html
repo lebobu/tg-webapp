@@ -102,6 +102,25 @@
       }
     };
   </script>
+  
+<!-- Help modal -->
+<div id="help-modal" class="modal" aria-hidden="true">
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" aria-describedby="help-body">
+    <button class="modal__close" type="button" aria-label="Закрыть" data-close>&times;</button>
+
+    <h3 id="help-title" class="modal__title">Как оформить заказ</h3>
+    <div id="help-body" class="modal__content">
+      <p>1) Выберите тариф и параметры на шагах мастера.</p>
+      <p>2) Проверьте сумму и укажите e-mail на шаге подтверждения.</p>
+      <p>3) Нажмите «Подтвердить». Мы пришлём вам детали в Telegram.</p>
+      <hr>
+      <p><b>Есть вопросы?</b> Нажмите «❓ Помощь» ещё раз или напишите нам.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ваш скрипт -->
+<script defer src="wizard.js"></script>
 
   <script src="wizard.js"></script>
 </body>
