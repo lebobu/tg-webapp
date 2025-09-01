@@ -212,7 +212,7 @@ h2 {
   font-size: 24px; line-height: 1;
 }
 .modal__close:focus { outline: none; }
-.modal__close:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.modal__close:focus-visible { outline: 2px solid #f0f3f6; outline-offset: 2px; }
 
 /* Accordion (spoilers) */
 .accordion { margin: 0; padding: 0; }
@@ -223,6 +223,7 @@ h2 {
   background: #fff;
   margin: 8px 0;
   overflow: hidden;
+  color: brown;
 }
 
 /* убираем дефолтный маркер summary */
