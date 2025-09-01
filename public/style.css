@@ -202,6 +202,10 @@ h2 {
   color: crimson;
 }
 
+.modal__bottom{
+  color: rgb(22, 194, 179);
+}
+
 .modal__content{
   color: #111;
 }
