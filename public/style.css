@@ -191,6 +191,7 @@ h2 {
   box-shadow: 0 10px 30px rgba(0,0,0,.2);
   padding: 16px 16px 18px;
   font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: crimson;
 }
 
 .modal__title{
@@ -203,6 +204,7 @@ h2 {
 .modal__content{
   color: #111;
 }
+
 .modal__content hr{
   border: 0; height: 1px; background: #194f96; margin: 12px 0;
 }
