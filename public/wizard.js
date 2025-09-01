@@ -302,6 +302,17 @@ const helpBtn   = document.querySelector('.bt-help');      // ваша кноп�
 const helpModal = document.getElementById('help-modal');
 let _prevFocus = null;
 
+// Оставлять открытым только один раздел в модалке
+document.querySelectorAll('#help-modal .acc-item').forEach(d => {
+  d.addEventListener('toggle', () => {
+    if (d.open) {
+      document.querySelectorAll('#help-modal .acc-item').forEach(x => {
+        if (x !== d) x.open = false;
+      });
+    }
+  });
+});
+
 function openHelp(){
   if (!helpModal) return;
   _prevFocus = document.activeElement;

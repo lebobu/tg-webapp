@@ -108,15 +108,36 @@
   <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" aria-describedby="help-body">
     <button class="modal__close" type="button" aria-label="Закрыть" data-close>&times;</button>
 
-    <h3 id="help-title" class="modal__title">Как оформить заказ</h3>
-    <div id="help-body" class="modal__content">
-      <p>1) Выберите тариф и параметры на шагах мастера.</p>
-      <p>2) Проверьте сумму и укажите e-mail на шаге подтверждения.</p>
-      <p>3) Нажмите «Подтвердить». Мы пришлём вам детали в Telegram.</p>
-      <hr>
-      <p><b>Есть вопросы?</b> Нажмите «❓ Помощь» ещё раз или напишите нам.</p>
+    <h3 id="help-title" class="modal__title">Помощь</h3>
+    <div class="accordion" id="help-accordion">
+  <details class="acc-item" open>
+    <summary><span>Как оформить заказ</span></summary>
+    <div class="acc-body">
+      <ol>
+        <li>Выберите тариф на шаге 1.</li>
+        <li>На шаге 2 укажите параметры (для спец-тарифов — только срок).</li>
+        <li>На шаге 3 проверьте сумму, введите e-mail и нажмите «Подтвердить».</li>
+      </ol>
     </div>
+  </details>
+
+  <details class="acc-item">
+    <summary><span>Оплата и стоимость</span></summary>
+    <div class="acc-body">
+      <p>Итоговая сумма берётся из матрицы тарифов и не зависит от скидок.</p>
+      <p>Для «Роутер» и «Сервер VPS» стоимость задаётся по срокам.</p>
+    </div>
+  </details>
+
+  <details class="acc-item">
+    <summary><span>Частые вопросы</span></summary>
+    <div class="acc-body">
+      <p><b>Можно ли изменить заказ?</b><br>Да, перезапустите мини-приложение и отправьте новую заявку.</p>
+      <p><b>Не приходит сообщение в чат?</b><br>Проверьте подключение и e-mail, затем повторите подтверждение.</p>
+    </div>
+  </details>
   </div>
+</div>
 </div>
 
 <!-- ваш скрипт -->
