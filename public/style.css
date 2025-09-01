@@ -198,7 +198,7 @@ h2 {
 .modal__title{
   margin: 0 36px 8px 0;
   font-size: 16px;
-  font-weight: 700;
+  /* font-weight: 700; */
   /* color: crimson; */
 }
 
