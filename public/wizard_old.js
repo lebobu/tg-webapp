@@ -3,14 +3,13 @@ const tg = window.Telegram?.WebApp;
 tg?.expand();
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ---------- config/refs ----------
   const cfg = window.PRICING || {};
   const fmtCfg = cfg.display || {};
   const pricePreview = document.getElementById("pricePreview");
 
   let currentStep = 1;
   const totalSteps = 3;
-  const data = {}; // { plan, accounts, duration, email }
+  const data = {}; // { plan, accounts, duration }
 
   const steps = document.querySelectorAll(".step");
   const progressBar = document.getElementById("progress-bar");
@@ -18,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("next");
   const summaryEl = document.getElementById("summary");
 
-  // шаг 2: группы
+  // Узлы шага 2
   const accountsLabel =
     document.querySelector('.step-2 .accounts-label') || null;
 
@@ -28,24 +27,90 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".accounts") ||
     document.querySelector('.step-2 [data-group="accounts"]') || null;
 
-  const durationGroup =
-    document.querySelector("#durationGroup") ||
-    document.querySelector(".row-duration") ||
-    document.querySelector(".duration") ||
-    document.querySelector('.step-2 [data-group="duration"]') || null;
+  // const durationGroup =
+  //   document.querySelector("#durationGroup") ||
+  //   document.querySelector(".row-duration") ||
+  //   document.querySelector(".duration") ||
+  //   document.querySelector('.step-2 [data-group="duration"]') || null;
 
   const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
 
-  // шаг 3: email
   const emailInput = document.getElementById('email');
   const emailError = document.getElementById('email-error');
 
-  // ---------- validators / utils ----------
   const isValidEmail = (s) => {
     const v = String(s || '').trim();
+    // простой и надёжный для UI формат: "что-то@что-то.домен"
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   };
 
+  // Динамический прайс для окна Помощь
+  // форматирование денег: используем уже существующий formatMoney, если он есть
+  const fmtMoneyForTable = (n) => {
+    const cfg = window.PRICING || {};
+    if (typeof formatMoney === 'function') return formatMoney(n);
+    const cur = cfg.currency || '₽';
+    return `${Number(n).toLocaleString('ru-RU')} ${cur}`;
+  };
+
+  // Сборка HTML таблиц из window.PRICING.matrixTotals
+  function makePricingTables() {
+    const host = document.getElementById('pricing-tables');
+    if (!host) return;
+
+    const { matrixTotals = {} } = window.PRICING || {};
+    const parts = [];
+
+    // 1) Обычные тарифы (EU/RU): таблицы с осями "Аккаунты" × "Срок"
+    for (const [plan, table] of Object.entries(matrixTotals)) {
+      if (SPECIAL_PLANS.has(plan)) continue;
+
+      // список аккаунтов (строки)
+      const accounts = Object.keys(table).sort((a, b) => Number(a) - Number(b));
+      // объединённый список сроков (колонки)
+      const dset = new Set();
+      accounts.forEach(acc => {
+        Object.keys(table[acc] || {}).forEach(d => dset.add(d));
+      });
+      const durations = Array.from(dset).sort((a, b) => Number(a) - Number(b));
+
+      let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr><th>Аккаунты \\ Срок</th>`;
+      durations.forEach(d => html += `<th>${d} мес</th>`);
+      html += `</tr></thead><tbody>`;
+
+      accounts.forEach(acc => {
+        html += `<tr><th>${acc}</th>`;
+        durations.forEach(d => {
+          const v = table?.[acc]?.[d];
+          html += `<td>${(v != null) ? fmtMoneyForTable(v) : '—'}</td>`;
+        });
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table></div>`;
+      parts.push(html);
+    }
+     window.makePricingTables = makePricingTables;
+    // 2) Спец-тарифы (Роутер / Сервер VPS): таблица только по срокам
+    const specials = Object.entries(matrixTotals).filter(([p]) => SPECIAL_PLANS.has(p));
+    specials.forEach(([plan, obj]) => {
+      const durs = Object.keys(obj?.durations || {}).sort((a, b) => Number(a) - Number(b));
+      let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr>`;
+      durs.forEach(d => html += `<th>${d} мес</th>`);
+      html += `</tr></thead><tbody><tr>`;
+      durs.forEach(d => {
+        const v = obj?.durations?.[d];
+        html += `<td>${(v != null) ? fmtMoneyForTable(v) : '—'}</td>`;
+      });
+      html += `</tr></tbody></table></div>`;
+      parts.push(html);
+    });
+
+    host.innerHTML = parts.join('');
+  }
+
+
+  // ---------- utils ----------
   function formatMoney(n) {
     const ds = fmtCfg.decimalSep ?? ",";
     const ts = fmtCfg.thousandSep ?? " ";
@@ -64,8 +129,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Итог из матрицы (без формул):
-  // - обычные планы: totals[plan][accounts][duration]
-  // - спец-планы: totals[plan].durations[duration]
+  // - EU/RU: totals[plan][accounts][duration]
+  // - Роутер/VPS: totals[plan].durations[duration]
   function computeTotal(plan, accounts, duration) {
     if (!plan) return null;
     const table = cfg.matrixTotals?.[plan];
@@ -103,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderSummary() {
     const p = computeTotal(data.plan, data.accounts, data.duration);
-    const planLabel     = data.plan || "-";
+    const planLabel = data.plan || "-";
     const durationLabel = data.duration || "-";
 
     // Аккаунты показываем только для НЕ спец-планов
@@ -131,12 +196,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Сброс выбора шага 2 при переходе 1 -> 2
+  // Сброс выбора ШАГА 2 (только при переходе 1 -> 2)
   function resetStep2Selections() {
     delete data.accounts;
     delete data.duration;
 
-    // снять выделения с кнопок на шаге 2
+    // убрать выделение кнопок на шаге 2
     document.querySelectorAll('.step-2 .btn.option.selected')
       .forEach(el => el.classList.remove('selected'));
 
@@ -153,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (backBtn) backBtn.style.display = step === 1 ? "none" : "inline-block";
     if (nextBtn) nextBtn.textContent = step === totalSteps ? "Подтвердить" : "Далее";
 
-    // на шаге 2 — показать/скрыть "Аккаунты" для спец-планов
+    // На шаге 2 — показать/скрыть группу АККАУНТОВ для спец-планов
     if (step === 2) {
       const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
       if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
@@ -166,107 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (step === totalSteps) renderSummary();
   }
 
-  // ---------- генерация таблиц цен для модалки ----------
-  const fmtMoneyForTable = (n) => {
-    if (typeof formatMoney === 'function') return formatMoney(n);
-    const cur = (window.PRICING && window.PRICING.currency) || '₽';
-    return `${Number(n).toLocaleString('ru-RU')} ${cur}`;
-  };
-
-  function makePricingTables() {
-    const host = document.getElementById('pricing-tables');
-    if (!host) return;
-
-    const { matrixTotals = {} } = window.PRICING || {};
-    const parts = [];
-
-    // обычные планы
-    for (const [plan, table] of Object.entries(matrixTotals)) {
-      if (SPECIAL_PLANS.has(plan)) continue;
-
-      const accounts = Object.keys(table).sort((a,b)=>Number(a)-Number(b));
-      const dset = new Set();
-      accounts.forEach(acc => Object.keys(table[acc] || {}).forEach(d => dset.add(d)));
-      const durations = Array.from(dset).sort((a,b)=>Number(a)-Number(b));
-
-      let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr><th>Аккаунты \\ Срок</th>`;
-      durations.forEach(d => html += `<th>${d} мес</th>`);
-      html += `</tr></thead><tbody>`;
-
-      accounts.forEach(acc => {
-        html += `<tr><th>${acc}</th>`;
-        durations.forEach(d => {
-          const v = table?.[acc]?.[d];
-          html += `<td>${(v != null) ? fmtMoneyForTable(v) : '—'}</td>`;
-        });
-        html += `</tr>`;
-      });
-
-      html += `</tbody></table></div>`;
-      parts.push(html);
-    }
-
-    // спец-планы
-    const specials = Object.entries(matrixTotals).filter(([p]) => SPECIAL_PLANS.has(p));
-    specials.forEach(([plan, obj]) => {
-      const durs = Object.keys(obj?.durations || {}).sort((a,b)=>Number(a)-Number(b));
-      let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr>`;
-      durs.forEach(d => html += `<th>${d} мес</th>`);
-      html += `</tr></thead><tbody><tr>`;
-      durs.forEach(d => {
-        const v = obj?.durations?.[d];
-        html += `<td>${(v != null) ? fmtMoneyForTable(v) : '—'}</td>`;
-      });
-      html += `</tr></tbody></table></div>`;
-      parts.push(html);
-    });
-
-    host.innerHTML = parts.join('');
-  }
-
-  // ---------- help modal ----------
-  const helpBtn   = document.querySelector('.bt-help');
-  const helpModal = document.getElementById('help-modal');
-  let _prevFocus = null;
-
-  function openHelp(){
-    if (!helpModal) return;
-    _prevFocus = document.activeElement;
-    helpModal.classList.add('modal--open');
-    helpModal.removeAttribute('aria-hidden');
-    document.body.classList.add('no-scroll');
-
-    const closeBtn = helpModal.querySelector('[data-close]');
-    if (closeBtn) closeBtn.focus();
-
-    // генерируем/обновляем таблицы цен
-    makePricingTables();
-
-    // режим "только один открыт" в аккордеоне (необязательно)
-    helpModal.querySelectorAll('.acc-item').forEach(d => {
-      d.addEventListener('toggle', () => {
-        if (d.open) {
-          helpModal.querySelectorAll('.acc-item').forEach(x => { if (x !== d) x.open = false; });
-        }
-      });
-    });
-  }
-
-  function closeHelp(){
-    if (!helpModal) return;
-    helpModal.classList.remove('modal--open');
-    helpModal.setAttribute('aria-hidden','true');
-    document.body.classList.remove('no-scroll');
-    if (_prevFocus && typeof _prevFocus.focus === 'function') _prevFocus.focus();
-  }
-
-  helpBtn?.addEventListener('click', openHelp);
-  helpModal?.addEventListener('click', (e) => { if (e.target === helpModal) closeHelp(); });
-  helpModal?.querySelector('[data-close]')?.addEventListener('click', closeHelp);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && helpModal?.classList.contains('modal--open')) closeHelp();
-  });
-
   // ---------- выбор опций ----------
   document.querySelectorAll(".btn.option").forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -274,21 +238,22 @@ document.addEventListener("DOMContentLoaded", () => {
       const t = e.currentTarget;
       const { plan, accounts, duration } = t.dataset;
 
-      // эксклюзивный выбор в рамках родителя
+      // эксклюзивный выбор в рамках контейнера
       const group = t.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
       t.classList.add("selected");
 
       if (plan) {
         data.plan = plan;
+        // если выбран спец-план — аккаунты не нужны
         if (SPECIAL_PLANS.has(plan)) {
-          delete data.accounts; // для спец-планов аккаунты не нужны
+          delete data.accounts;
         }
       }
       if (accounts) data.accounts = accounts;
       if (duration) data.duration = Number(duration);
 
-      // если уже на шаге 2 — обновим видимость блока аккаунтов
+      // если уже на шаге 2 — просто обновим видимость блока аккаунтов
       if (currentStep === 2) {
         const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
         if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
@@ -307,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentStep === 1) {
       if (!data.plan) return alert("Пожалуйста, выберите тариф");
-      // 1 -> 2: сбрасываем предыдущий выбор
+      // Переход 1 -> 2: сбрасываем выбор второго шага
       resetStep2Selections();
     }
 
@@ -325,27 +290,27 @@ document.addEventListener("DOMContentLoaded", () => {
       currentStep++;
       showStep(currentStep);
     } else {
-      // ШАГ 3 — валидируем e-mail (обязателен)
-      const val = emailInput ? String(emailInput.value).trim() : '';
-      if (!isValidEmail(val)) {
-        if (emailError) emailError.style.display = 'block';
-        if (emailInput) {
-          emailInput.focus();
-          emailInput.style.borderColor = '#c62828';
+      // мы на шаге 3 — проверяем e-mail
+      if (currentStep === totalSteps) {
+        const val = emailInput ? String(emailInput.value).trim() : '';
+        if (!isValidEmail(val)) {
+          if (emailError) emailError.style.display = 'block';
+          if (emailInput) {
+            emailInput.focus();
+            emailInput.style.borderColor = '#f4f803ff';
+          }
+          return; // стоп подтверждение
         }
-        return;
+        data.email = val; // добавляем в данные заявки
       }
-      data.email = val;
-
-      // собираем payload и отправляем (inline-поток)
+      // подтверждение → отправка (inline + answerWebAppQuery)
       const pricing = computeTotal(data.plan, data.accounts, data.duration);
       const payload = { ...data, pricing };
 
       const qid = tg?.initDataUnsafe?.query_id;
       const fromId = tg?.initDataUnsafe?.user?.id;
       if (!qid) {
-        // fallback: если не из inline-кнопки
-        try { tg?.sendData(JSON.stringify(payload)); } catch (_) {}
+        try { tg?.sendData(JSON.stringify(payload)); } catch (_) { }
         tg?.close();
         return;
       }
@@ -369,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const blob = new Blob([json], { type: 'application/json' });
         if (!('sendBeacon' in navigator) || !navigator.sendBeacon('/webapp-answer', blob)) {
           alert('Не удалось отправить данные. Проверьте сеть и попробуйте ещё раз.');
-          return; // не закрываем — чтобы можно было повторить
+          return; // не закрываем — пусть попробует снова
         }
         tg?.close();
       }
@@ -384,15 +349,68 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // рендер 1-го шага
   showStep(currentStep);
 
-  // лайв-проверка e-mail
+  // ⬇️ ДОБАВЬ ЭТОТ БЛОК СРАЗУ ПОСЛЕ showStep(...)
   if (emailInput) {
     emailInput.addEventListener('input', () => {
       const ok = isValidEmail(emailInput.value);
       emailInput.style.borderColor = ok ? '#d0d0d4' : '#c62828';
       if (emailError) emailError.style.display = ok ? 'none' : 'block';
     });
+  }
+
+});
+
+// --- Help modal logic ---
+const helpBtn = document.querySelector('.bt-help');      // ваша кнопка "?"
+const helpModal = document.getElementById('help-modal');
+let _prevFocus = null;
+
+// Оставлять открытым только один раздел в модалке
+document.querySelectorAll('#help-modal .acc-item').forEach(d => {
+  d.addEventListener('toggle', () => {
+    if (d.open) {
+      document.querySelectorAll('#help-modal .acc-item').forEach(x => {
+        if (x !== d) x.open = false;
+      });
+    }
+  });
+});
+
+function openHelp() {
+  if (!helpModal) return;
+  _prevFocus = document.activeElement;
+  helpModal.classList.add('modal--open');
+  helpModal.removeAttribute('aria-hidden');
+  document.body.classList.add('no-scroll');
+  // Фокус на крестик
+  const closeBtn = helpModal.querySelector('[data-close]');
+  if (closeBtn) closeBtn.focus();
+  window.makePricingTables?.();       // ← сгенерировать/обновить таблицы цен
+}
+
+function closeHelp() {
+  if (!helpModal) return;
+  helpModal.classList.remove('modal--open');
+  helpModal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('no-scroll');
+  // Вернуть фокус на кнопку
+  if (_prevFocus && typeof _prevFocus.focus === 'function') {
+    _prevFocus.focus();
+  }
+}
+
+// Открытие
+helpBtn?.addEventListener('click', openHelp);
+
+// Закрытие: по крестику, клику по фону, Esc
+helpModal?.addEventListener('click', (e) => {
+  if (e.target === helpModal) closeHelp();          // клик по подложке
+});
+helpModal?.querySelector('[data-close]')?.addEventListener('click', closeHelp);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && helpModal?.classList.contains('modal--open')) {
+    closeHelp();
   }
 });
