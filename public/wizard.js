@@ -28,13 +28,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".accounts") ||
     document.querySelector('.step-2 [data-group="accounts"]') || null;
 
-  const durationGroup =
-    document.querySelector("#durationGroup") ||
-    document.querySelector(".row-duration") ||
-    document.querySelector(".duration") ||
-    document.querySelector('.step-2 [data-group="duration"]') || null;
+  // const durationGroup =
+  //   document.querySelector("#durationGroup") ||
+  //   document.querySelector(".row-duration") ||
+  //   document.querySelector(".duration") ||
+  //   document.querySelector('.step-2 [data-group="duration"]') || null;
 
-  const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
+  // const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
+  const SPECIAL_PLANS = new Set(["Роутер"]);
 
   // шаг 3: email
   const emailInput = document.getElementById('email');
