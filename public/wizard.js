@@ -42,73 +42,72 @@ document.addEventListener("DOMContentLoaded", () => {
     const v = String(s || '').trim();
     // простой и надёжный для UI формат: "что-то@что-то.домен"
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  };
+  
+  // Динамический прайс для окна Помощь
+  // форматирование денег: используем уже существующий formatMoney, если он есть
+  const fmtMoneyForTable = (n) => {
+    const cfg = window.PRICING || {};
+    if (typeof formatMoney === 'function') return formatMoney(n);
+    const cur = cfg.currency || '₽';
+    return `${Number(n).toLocaleString('ru-RU')} ${cur}`;
+  };
 
-    // Динамический прайс для окна Помощь
-    // форматирование денег: используем уже существующий formatMoney, если он есть
-const fmtMoneyForTable = (n) => {
-  const cfg = window.PRICING || {};
-  if (typeof formatMoney === 'function') return formatMoney(n);
-  const cur = cfg.currency || '₽';
-  return `${Number(n).toLocaleString('ru-RU')} ${cur}`;
-};
+  // Сборка HTML таблиц из window.PRICING.matrixTotals
+  function makePricingTables() {
+    const host = document.getElementById('pricing-tables');
+    if (!host) return;
 
-// Сборка HTML таблиц из window.PRICING.matrixTotals
-function makePricingTables() {
-  const host = document.getElementById('pricing-tables');
-  if (!host) return;
+    const { matrixTotals = {} } = window.PRICING || {};
+    const parts = [];
 
-  const { matrixTotals = {} } = window.PRICING || {};
-  const parts = [];
+    // 1) Обычные тарифы (EU/RU): таблицы с осями "Аккаунты" × "Срок"
+    for (const [plan, table] of Object.entries(matrixTotals)) {
+      if (SPECIAL_PLANS.has(plan)) continue;
 
-  // 1) Обычные тарифы (EU/RU): таблицы с осями "Аккаунты" × "Срок"
-  for (const [plan, table] of Object.entries(matrixTotals)) {
-    if (SPECIAL_PLANS.has(plan)) continue;
+      // список аккаунтов (строки)
+      const accounts = Object.keys(table).sort((a, b) => Number(a) - Number(b));
+      // объединённый список сроков (колонки)
+      const dset = new Set();
+      accounts.forEach(acc => {
+        Object.keys(table[acc] || {}).forEach(d => dset.add(d));
+      });
+      const durations = Array.from(dset).sort((a, b) => Number(a) - Number(b));
 
-    // список аккаунтов (строки)
-    const accounts = Object.keys(table).sort((a,b) => Number(a) - Number(b));
-    // объединённый список сроков (колонки)
-    const dset = new Set();
-    accounts.forEach(acc => {
-      Object.keys(table[acc] || {}).forEach(d => dset.add(d));
-    });
-    const durations = Array.from(dset).sort((a,b)=> Number(a) - Number(b));
+      let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr><th>Аккаунты \\ Срок</th>`;
+      durations.forEach(d => html += `<th>${d} мес</th>`);
+      html += `</tr></thead><tbody>`;
 
-    let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr><th>Аккаунты \\ Срок</th>`;
-    durations.forEach(d => html += `<th>${d} мес</th>`);
-    html += `</tr></thead><tbody>`;
+      accounts.forEach(acc => {
+        html += `<tr><th>${acc}</th>`;
+        durations.forEach(d => {
+          const v = table?.[acc]?.[d];
+          html += `<td>${(v != null) ? fmtMoneyForTable(v) : '—'}</td>`;
+        });
+        html += `</tr>`;
+      });
 
-    accounts.forEach(acc => {
-      html += `<tr><th>${acc}</th>`;
-      durations.forEach(d => {
-        const v = table?.[acc]?.[d];
+      html += `</tbody></table></div>`;
+      parts.push(html);
+    }
+
+    // 2) Спец-тарифы (Роутер / Сервер VPS): таблица только по срокам
+    const specials = Object.entries(matrixTotals).filter(([p]) => SPECIAL_PLANS.has(p));
+    specials.forEach(([plan, obj]) => {
+      const durs = Object.keys(obj?.durations || {}).sort((a, b) => Number(a) - Number(b));
+      let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr>`;
+      durs.forEach(d => html += `<th>${d} мес</th>`);
+      html += `</tr></thead><tbody><tr>`;
+      durs.forEach(d => {
+        const v = obj?.durations?.[d];
         html += `<td>${(v != null) ? fmtMoneyForTable(v) : '—'}</td>`;
       });
-      html += `</tr>`;
+      html += `</tr></tbody></table></div>`;
+      parts.push(html);
     });
 
-    html += `</tbody></table></div>`;
-    parts.push(html);
+    host.innerHTML = parts.join('');
   }
-
-  // 2) Спец-тарифы (Роутер / Сервер VPS): таблица только по срокам
-  const specials = Object.entries(matrixTotals).filter(([p]) => SPECIAL_PLANS.has(p));
-  specials.forEach(([plan, obj]) => {
-    const durs = Object.keys(obj?.durations || {}).sort((a,b)=> Number(a) - Number(b));
-    let html = `<h4 class="pt-title">${plan}</h4><div class="pt-wrap"><table class="price-table"><thead><tr>`;
-    durs.forEach(d => html += `<th>${d} мес</th>`);
-    html += `</tr></thead><tbody><tr>`;
-    durs.forEach(d => {
-      const v = obj?.durations?.[d];
-      html += `<td>${(v != null) ? fmtMoneyForTable(v) : '—'}</td>`;
-    });
-    html += `</tr></tbody></table></div>`;
-    parts.push(html);
-  });
-
-  host.innerHTML = parts.join('');
-}
-
-  };
 
 
   // ---------- utils ----------
@@ -364,7 +363,7 @@ function makePricingTables() {
 });
 
 // --- Help modal logic ---
-const helpBtn   = document.querySelector('.bt-help');      // ваша кнопка "?"
+const helpBtn = document.querySelector('.bt-help');      // ваша кнопка "?"
 const helpModal = document.getElementById('help-modal');
 let _prevFocus = null;
 
@@ -379,7 +378,7 @@ document.querySelectorAll('#help-modal .acc-item').forEach(d => {
   });
 });
 
-function openHelp(){
+function openHelp() {
   if (!helpModal) return;
   _prevFocus = document.activeElement;
   helpModal.classList.add('modal--open');
@@ -391,10 +390,10 @@ function openHelp(){
   makePricingTables();       // ← сгенерировать/обновить таблицы цен
 }
 
-function closeHelp(){
+function closeHelp() {
   if (!helpModal) return;
   helpModal.classList.remove('modal--open');
-  helpModal.setAttribute('aria-hidden','true');
+  helpModal.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('no-scroll');
   // Вернуть фокус на кнопку
   if (_prevFocus && typeof _prevFocus.focus === 'function') {
