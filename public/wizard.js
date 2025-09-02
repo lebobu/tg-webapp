@@ -34,9 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
   //   document.querySelector(".duration") ||
   //   document.querySelector('.step-2 [data-group="duration"]') || null;
 
-  // const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
-  const SPECIAL_PLANS = new Set(["Роутер"]);
-
+  const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
+  
   // шаг 3: email
   const emailInput = document.getElementById('email');
   const emailError = document.getElementById('email-error');
