@@ -256,6 +256,8 @@ h2 {
 /* своя стрелка */
 .acc-item summary::before{
   content: "▸";
+  font-size: 20px;        /* ← больше размер стрелки */
+  line-height: 1; 
   display: inline-block;
   margin-right: 8px;
   transform: translateY(-1px);
