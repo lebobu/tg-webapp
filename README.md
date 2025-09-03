@@ -47,4 +47,4 @@ Pull: Pull
 
 Хотфикс в prod сделал? Потом не забудь вернуть фикс в main (merge/cherry-pick).
 
-# v 1.2 
+# v 1.2 ???
