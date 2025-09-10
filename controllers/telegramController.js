@@ -1,5 +1,10 @@
 // controllers/telegramController.js
 const chatStore = require('../chatStore'); // если не используете — удалите эту строку и вызовы chatStore.*
+// список админов из окружения (через запятую)
+const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || '')
+  .split(/[,\s]+/)
+  .map(x => x.trim())
+  .filter(Boolean);
 
 function escMd(s = '') {
   return String(s).replace(/([_*[\]()~`>#+\-=|{}.!])/g, '\\$1');
@@ -17,6 +22,18 @@ function buildPriceLines(pricing) {
   if (pricing.discount !== undefined)     extras.push(`скидка ${pricing.discount}`);
   if (extras.length) lines[1] += ` _(${escMd(extras.join(', '))})_`;
  */  return lines;
+}
+
+async function notifyAdmins(bot, lines) {
+  if (!ADMIN_IDS.length) return;
+  const text = ['🛎 *Новая заявка*', ...lines].join('\n');
+  for (const adminId of ADMIN_IDS) {
+    try {
+      await bot.sendMessage(adminId, text, { parse_mode: 'Markdown' });
+    } catch (e) {
+      console.warn('notifyAdmins failed for', adminId, e.message);
+    }
+  }
 }
 
 module.exports = (bot) => ({
@@ -129,7 +146,13 @@ module.exports = (bot) => ({
 
       res.json({ ok: true });
     } catch (e) {
-      console.error('answerWebAppQuery error:', e);
+      console.er// 3) Отправить summary админам
+      await notifyAdmins(bot, [
+        ...baseLines,
+        ...priceLines,
+        `• *User ID:* ${from_id || '—'}`,
+        `• *Chat ID:* ${(from_id && await chatStore.get(from_id)) || '—'}`
+      ]);ror('answerWebAppQuery error:', e);
       res.status(500).json({ ok: false });
     }
   },
