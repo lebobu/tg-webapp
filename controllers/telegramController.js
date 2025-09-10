@@ -144,15 +144,17 @@ module.exports = (bot) => ({
         }
       }
 
-      res.json({ ok: true });
-    } catch (e) {
-      console.er// 3) Отправить summary админам
+// 3) Отправить summary админам
       await notifyAdmins(bot, [
         ...baseLines,
         ...priceLines,
         `• *User ID:* ${from_id || '—'}`,
         `• *Chat ID:* ${(from_id && await chatStore.get(from_id)) || '—'}`
-      ]);ror('answerWebAppQuery error:', e);
+      ]);
+
+      res.json({ ok: true });
+    } catch (e) {
+      console.error('answerWebAppQuery error:', e);
       res.status(500).json({ ok: false });
     }
   },
