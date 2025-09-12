@@ -125,12 +125,12 @@ module.exports = (bot) => ({
       const text = [...baseLines, ...priceLines].join('\n');
 
       // 1) Ответ на inline-запрос (сообщение появится в чате)
-      await bot.answerWebAppQuery(query_id, {
-        type: 'article',
-        id: String(Date.now()),
-        title: 'Заявка подтверждена',
-        input_message_content: { message_text: text, parse_mode: 'Markdown' }
-      });
+      // await bot.answerWebAppQuery(query_id, {
+      //   type: 'article',
+      //   id: String(Date.now()),
+      //   title: 'Заявка подтверждена',
+      //   input_message_content: { message_text: text, parse_mode: 'Markdown' }
+      // });
 
       // 2) Параллельно — обычное сообщение от бота (если знаем chat_id)
       if (from_id) {
