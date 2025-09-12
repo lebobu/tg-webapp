@@ -12,7 +12,7 @@ const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || ''
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').trim();
 
 function escMd(s = '') {
-  return String(s).replace(/([_*[\]()~`>#+\-=|{}.!])/g, '\\$1');
+  return String(s).replace(/([_*[\]()~`>#+\-=|{}])/g, '\\$1');
 }
 function escHtml(s = '') {
   return String(s)
