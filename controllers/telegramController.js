@@ -113,7 +113,7 @@ module.exports = (bot) => ({
       const email    = data?.email ?? '-';
 
       const baseLines = [
-        '✅ *Заявка подтверждена*',
+        '✅ *Заявка подтверждена*!',
         `• *Тариф:* ${escMd(plan)}`,
          // показываем "Аккаунтов" только если НЕ спец-план
         ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
