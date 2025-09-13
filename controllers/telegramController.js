@@ -3,6 +3,21 @@ const chatStore = require('../chatStore');        // если не исполь�
 const { sendMail } = require('../mailer');        // nodemailer-обёртка (см. mailer.js)
 const { buildOrderEmail } = require('../emailTemplates'); // НОВОЕ: «красивые» HTML-письма
 
+
+// Опционально: можно задать свою фразу в .env
+// PAYMENT_NOTE="После подтверждения мы пришлём реквизиты..."
+const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
+
+// Блок «Оплата» только для Telegram-сообщений пользователю
+function buildPaymentNote(pricing) {
+  const lines = ['', '———', '💳 *Оплата*'];
+  if (pricing?.total != null) {
+    lines.push(`К оплате: ${escMd(pricing.total)} руб.`);
+  }
+  lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail.'));
+  return lines.join('\n');
+}
+
 /* ===================== ENV / CONFIG ===================== */
 
 // Telegram-админы (ID через запятую)
@@ -16,10 +31,10 @@ const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').trim();
 
 // Брендовые настройки для HTML-писем
 const BRAND = {
-  name:         process.env.BRAND_NAME     || 'Сервис Вялого Пингвина',
-  logo:         process.env.BRAND_LOGO_URL || '',       // URL логотипа (PNG/SVG)
-  primary:      process.env.BRAND_PRIMARY  || '#0a84ff',
-  supportEmail: process.env.SUPPORT_EMAIL  || ''
+  name: process.env.BRAND_NAME || 'Сервис Вялого Пингвина',
+  logo: process.env.BRAND_LOGO_URL || '',       // URL логотипа (PNG/SVG)
+  primary: process.env.BRAND_PRIMARY || '#0a84ff',
+  supportEmail: process.env.SUPPORT_EMAIL || ''
 };
 
 /* ===================== HELPERS ===================== */
@@ -50,7 +65,7 @@ async function notifyAdmins(bot, lines) {
   }
 }
 
-const SPECIAL_PLANS = new Set(['Роутер','Сервер VPS']);
+const SPECIAL_PLANS = new Set(['Роутер', 'Сервер VPS']);
 
 /* ===================== EMAIL SENDER (HTML CARD) ===================== */
 
@@ -58,7 +73,7 @@ async function emailAdminsAndUser({ order }) {
   try {
     // шаблоны для админа и пользователя
     const adminTpl = buildOrderEmail({ brand: BRAND, order }).admin;
-    const userTpl  = buildOrderEmail({ brand: BRAND, order }).user;
+    const userTpl = buildOrderEmail({ brand: BRAND, order }).user;
 
     // админу
     if (ADMIN_EMAIL) {
@@ -80,7 +95,7 @@ module.exports = (bot) => ({
   // /start — inline-кнопка с web_app (вариант B)
   onStartCommand: async (msg) => {
     const url = process.env.SERVER_URL;
-    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (_) {}
+    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (_) { }
     bot.sendMessage(
       msg.chat.id,
       'Перейти для оформления заказа\nЕсть вопросы — нажмите ❓ в каталоге',
@@ -94,7 +109,7 @@ module.exports = (bot) => ({
 
   // общий listener — обновляем маппинг user→chat на любое сообщение
   onAnyMessage: async (msg) => {
-    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (_) {}
+    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (_) { }
   },
 
   // /id
@@ -114,11 +129,11 @@ module.exports = (bot) => ({
       const { user, platform, form, pricing, email, subscribe } = req.body || {};
       if (!user?.id) return res.status(400).json({ ok: false, error: 'no user.id' });
 
-      const plan     = form?.plan ?? '-';
+      const plan = form?.plan ?? '-';
       const accounts = form?.accounts ?? '-';
       const duration = form?.duration ?? '-';
       const emailStr = (email || form?.email || '').trim();
-      const subs     = !!subscribe;
+      const subs = !!subscribe;
 
       const base = [
         `• *Тариф:* ${escMd(plan)}`,
@@ -172,11 +187,11 @@ module.exports = (bot) => ({
       const { query_id, from_id, data } = req.body || {};
       if (!query_id) return res.status(400).json({ ok: false, error: 'no query_id' });
 
-      const plan      = data?.plan ?? '-';
-      const accounts  = data?.accounts ?? '-';
-      const duration  = data?.duration ?? '-';
-      const pricing   = data?.pricing; // { total, ... }
-      const email     = (data?.email || '').trim();
+      const plan = data?.plan ?? '-';
+      const accounts = data?.accounts ?? '-';
+      const duration = data?.duration ?? '-';
+      const pricing = data?.pricing; // { total, ... }
+      const email = (data?.email || '').trim();
       const subscribe = !!data?.subscribe;
 
       const baseLines = [
@@ -188,37 +203,37 @@ module.exports = (bot) => ({
         `• *Подписка:* ${subscribe ? 'включена' : 'нет'}`
       ];
       const priceLines = buildPriceLines(pricing);
-      const text = [...baseLines, ...priceLines].join('\n');
-
+      // стало: для пользователя добавляем блок «Оплата»
+      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
+      const textForAdmins = [...baseLines, ...priceLines].join('\n'); // админам без блока «Оплата»
       // 1) Ответ на inline-запрос (сообщение появится в чате)
       await bot.answerWebAppQuery(query_id, {
         type: 'article',
         id: String(Date.now()),
         title: 'Заявка подтверждена',
-        input_message_content: { message_text: text, parse_mode: 'Markdown' }
+        input_message_content: { message_text: textForUser, parse_mode: 'Markdown' }
       });
 
       // 2) Параллельно — обычное сообщение от бота (если знаем chat_id)
+      // 2) дубликат пользователю в ЛС (если знаем chat_id)
       let chatId = null;
       if (from_id) {
         try {
           chatId = await chatStore.get(from_id);
-          if (chatId) {
-            await bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
-          }
+          if (chatId) await bot.sendMessage(chatId, textForUser, { parse_mode: 'Markdown' });
         } catch (e) {
-          console.warn('sendMessage fallback failed:', e);
+          console.warn('sendMessage to user failed:', e.message);
         }
       }
 
-      // 3) Отправить summary админам (Telegram)
+      // 3) админам — без блока «Оплата»
       await notifyAdmins(bot, [
         ...baseLines,
         ...priceLines,
         `• *User ID:* ${from_id || '—'}`,
         `• *Chat ID:* ${chatId || (from_id && await chatStore.get(from_id)) || '—'}`
       ]);
-
+      
       // 4) E-mail админу и пользователю — ИСПОЛЬЗУЕМ НОВЫЙ ШАБЛОН
       await emailAdminsAndUser({
         order: {
