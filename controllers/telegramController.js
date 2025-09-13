@@ -53,6 +53,11 @@ function buildPriceLines(pricing) {
   return [`• *Итого:* ${escMd(pricing.total)} руб.`];
 }
 
+function asUsername(u) {
+  const v = (u || '').toString().trim();
+  return v ? '@' + v.replace(/^@/, '') : 'none';
+}
+
 async function notifyAdmins(bot, lines) {
   if (!ADMIN_IDS.length) return;
   const text = ['🛎 *Новая заявка*', ...lines].join('\n');
@@ -153,11 +158,22 @@ module.exports = (bot) => ({
         { parse_mode: 'Markdown' }
       );
 
+const usernameVal = (user && user.username) || null;
+// Если хотите подстраховаться:
+try {
+  if (!usernameVal) {
+    const ch = await bot.getChat(user.id);
+    // возьмём из getChat, если не пришёл в апдейте
+    if (ch?.username) usernameVal = ch.username;
+  }
+} catch {}
+
       // админам в Telegram
       await notifyAdmins(bot, [
         ...base,
         ...price,
-        `• *Chat ID:* ${await chatStore.get(user.id) || '—'}`
+         `• *Username:* ${escMd(asUsername(usernameVal))}`,   // ← НОВОЕ
+  `• *Chat ID:* ${escMd((await chatStore.get(user.id)) ?? 'none')}`
       ]);
 
       // письма админу и пользователю — ИСПОЛЬЗУЕМ НОВЫЙ ШАБЛОН
@@ -225,11 +241,19 @@ module.exports = (bot) => ({
           console.warn('sendMessage to user failed:', e.message);
         }
       }
-
+// ⬇️ ДОБАВИТЬ: пробуем получить username у пользователя
+let usernameVal = null;
+if (from_id) {
+  try {
+    const ch = await bot.getChat(from_id); // сработает, если бот уже видел пользователя
+    usernameVal = ch?.username || null;
+  } catch {}
+}
       // 3) админам — без блока «Оплата»
       await notifyAdmins(bot, [
         ...baseLines,
         ...priceLines,
+        `• *Username:* ${escMd(asUsername(usernameVal))}`,   // ← НОВОЕ
         `• *User ID:* ${from_id || '—'}`,
         `• *Chat ID:* ${chatId || (from_id && await chatStore.get(from_id)) || '—'}`
       ]);

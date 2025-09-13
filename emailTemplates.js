@@ -153,15 +153,6 @@ Email: ${email || '-'}
 Подписка: ${subscribe ? 'включена' : 'нет'}
 ${pricing?.total != null ? `Итого: ${totalStr} руб.` : ''}
 
-    <summary><span>Как оплатить заказ</span></summary>
-    <div class="acc-body">
-      <ul>
-        <li>Через СБП по номеру +79957979609</li>
-        <li>По номеру банковской карты 5536090318609271</li>
-        <li>Совкомбанк Владимир А.</li>
-      </ul>
-    </div>
-
 ${variant === 'admin'
   ? [(userId ? `User ID: ${userId}` : ''), (chatId ? `Chat ID: ${chatId}` : '')].filter(Boolean).join('\n')
   : ''}`.replace(/\n{3,}/g, '\n\n');
