@@ -16,7 +16,7 @@ const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').trim();
 
 // Брендовые настройки для HTML-писем
 const BRAND = {
-  name:         process.env.BRAND_NAME     || 'Catalog Bot',
+  name:         process.env.BRAND_NAME     || 'Сервис Вялого Пингвина',
   logo:         process.env.BRAND_LOGO_URL || '',       // URL логотипа (PNG/SVG)
   primary:      process.env.BRAND_PRIMARY  || '#0a84ff',
   supportEmail: process.env.SUPPORT_EMAIL  || ''
