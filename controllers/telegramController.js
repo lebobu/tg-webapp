@@ -12,7 +12,7 @@ const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
 function buildPaymentNote(pricing) {
   const lines = ['', '———', '💳 *Оплата*'];
   if (pricing?.total != null) {
-    lines.push(`К оплате: ${escMd(pricing.total)} руб.`);
+    lines.push(`${escMd(pricing.total)} руб.`);
   }
   lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail.'));
   return lines.join('\n');
@@ -126,14 +126,14 @@ module.exports = (bot) => ({
   // (опционально) поток /data
   onWebAppData: async (req, res) => {
     try {
-      const { user, platform, form, pricing, email, subscribe } = req.body || {};
+      const { user, platform, form, pricing, email/*, subscribe */} = req.body || {};
       if (!user?.id) return res.status(400).json({ ok: false, error: 'no user.id' });
 
       const plan = form?.plan ?? '-';
       const accounts = form?.accounts ?? '-';
       const duration = form?.duration ?? '-';
       const emailStr = (email || form?.email || '').trim();
-      const subs = !!subscribe;
+      // const subs = !!subscribe;
 
       const base = [
         `• *Тариф:* ${escMd(plan)}`,
@@ -167,7 +167,7 @@ module.exports = (bot) => ({
           accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
           duration,
           email: emailStr,
-          subscribe: subs,
+          // subscribe: subs,
           pricing,
           userId: user.id,
           chatId: await chatStore.get(user.id)
@@ -192,7 +192,7 @@ module.exports = (bot) => ({
       const duration = data?.duration ?? '-';
       const pricing = data?.pricing; // { total, ... }
       const email = (data?.email || '').trim();
-      const subscribe = !!data?.subscribe;
+      // const subscribe = !!data?.subscribe;
 
       const baseLines = [
         '✅ *Заявка подтверждена!*',
@@ -200,7 +200,7 @@ module.exports = (bot) => ({
         ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
         `• *Срок:* ${escMd(duration)} мес.`,
         `• *Email:* ${escMd(email || '-')}`,
-        `• *Подписка:* ${subscribe ? 'включена' : 'нет'}`
+        // `• *Подписка:* ${subscribe ? 'включена' : 'нет'}`
       ];
       const priceLines = buildPriceLines(pricing);
       // стало: для пользователя добавляем блок «Оплата»
@@ -241,7 +241,7 @@ module.exports = (bot) => ({
           accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
           duration,
           email,
-          subscribe,
+          // subscribe,
           pricing,
           userId: from_id,
           chatId
