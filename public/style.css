@@ -190,6 +190,12 @@ h2 {
   margin: 6vh auto 4vh;
   max-width: 640px;
   width: calc(100% - 32px);
+
+  /* КЛЮЧЕВЫЕ СТРОКИ: */
+  max-height: 84vh;              /* чтобы «вписываться» в экран */
+  overflow: auto;                 /* прокрутка внутри модалки */
+  -webkit-overflow-scrolling: touch; /* плавный скролл на iOS */
+
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(0,0,0,.2);
@@ -198,11 +204,16 @@ h2 {
   color: crimson;
 }
 
+/* при очень низких экранах можно ужать вертикальные отступы */
+@media (max-height: 580px){
+  .modal__dialog{ margin: 4vh auto; max-height: 90vh; }
+}
+
+/* чтобы шапка/кнопка закрытия не уезжали при прокрутке — опц. «стикнуть» заголовок */
 .modal__title{
-  margin: 0 36px 8px 0;
-  font-size: 16px;
-  /* font-weight: 700; */
-  /* color: crimson; */
+  position: sticky; top: 0;
+  background: #fff; padding-top: 2px;
+  z-index: 1;
 }
 
 .modal__bottom{
@@ -210,6 +221,9 @@ h2 {
 }
 
 .modal__content{
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: inherit;   /* подхватит ограничение от .modal__dialog */
   color: #111;
 }
 
