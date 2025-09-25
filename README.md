@@ -51,3 +51,5 @@ Pull: Pull
 
 
 # v 1.2 
+# v 1.5
+# Control point before email check
