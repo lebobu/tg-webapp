@@ -1,23 +1,21 @@
-name: Deploy to Server
+# .github/workflows/deploy.yml
+name: Deploy
 
 on:
   push:
-    branches: [ main ]   # слушаем обе; оставь одну, если точно знаешь
-  workflow_dispatch:              # ручной запуск из вкладки Actions
+    branches: [ main, prod ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: (Optional) Checkout repository
-        uses: actions/checkout@v4
-
       - name: Write SSH key from secret
         run: |
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Open SSH session (forced-command runs on server)
+      - name: Deploy dispatch (server forced-command decides)
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem root@217.114.1.224
+          # передаём имя ветки в SSH_ORIGINAL_COMMAND
+          ssh -o StrictHostKeyChecking=no -i key.pem root@217.114.1.224 "${GITHUB_REF_NAME}"
