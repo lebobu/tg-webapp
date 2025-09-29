@@ -5,6 +5,8 @@ const express     = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const path        = require('path');
 
+const { getCustomerByUserId } = require('./googleSheets');
+
 const BOT_TOKEN  = process.env.BOT_TOKEN;
 const SERVER_URL = process.env.SERVER_URL;
 const PORT       = process.env.PORT || 3000;
@@ -36,5 +38,20 @@ app.get('/health', (_, res) => res.json({ ok: true }));
 
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on port ${PORT}`);
+});
+
+// префилл e-mail для WebApp
+app.post('/prefill-email', async (req, res) => {
+  try {
+    const { user_id } = req.body || {};
+    if (!user_id) return res.json({ ok: true, email: null });
+
+    const c = await getCustomerByUserId(user_id);
+    const email = c?.email || null;
+    res.json({ ok: true, email });
+  } catch (e) {
+    console.error('prefill-email error', e);
+    res.json({ ok: false, email: null });
+  }
 });
 
