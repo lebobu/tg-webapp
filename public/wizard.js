@@ -28,12 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".accounts") ||
     document.querySelector('.step-2 [data-group="accounts"]') || null;
 
-  // const durationGroup =
-  //   document.querySelector("#durationGroup") ||
-  //   document.querySelector(".row-duration") ||
-  //   document.querySelector(".duration") ||
-  //   document.querySelector('.step-2 [data-group="duration"]') || null;
-
   const SPECIAL_PLANS = new Set(["Роутер", "Сервер VPS"]);
   
   // шаг 3: email
@@ -136,11 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
     delete data.accounts;
     delete data.duration;
 
-    // снять выделения с кнопок на шаге 2
     document.querySelectorAll('.step-2 .btn.option.selected')
       .forEach(el => el.classList.remove('selected'));
 
-    // спрятать превью цены
     if (pricePreview) {
       pricePreview.classList.remove('show');
       pricePreview.textContent = '';
@@ -153,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (backBtn) backBtn.style.display = step === 1 ? "none" : "inline-block";
     if (nextBtn) nextBtn.textContent = step === totalSteps ? "Подтвердить" : "Далее";
 
-    // на шаге 2 — показать/скрыть "Аккаунты" для спец-планов
     if (step === 2) {
       const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
       if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
@@ -239,10 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeBtn = helpModal.querySelector('[data-close]');
     if (closeBtn) closeBtn.focus();
 
-    // генерируем/обновляем таблицы цен
     makePricingTables();
-
-    // режим "только один открыт" в аккордеоне (необязательно)
     helpModal.querySelectorAll('.acc-item').forEach(d => {
       d.addEventListener('toggle', () => {
         if (d.open) {
@@ -274,7 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const t = e.currentTarget;
       const { plan, accounts, duration } = t.dataset;
 
-      // эксклюзивный выбор в рамках родителя
       const group = t.parentElement.querySelectorAll(".btn.option");
       group.forEach((el) => el.classList.remove("selected"));
       t.classList.add("selected");
@@ -282,13 +269,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (plan) {
         data.plan = plan;
         if (SPECIAL_PLANS.has(plan)) {
-          delete data.accounts; // для спец-планов аккаунты не нужны
+          delete data.accounts;
         }
       }
       if (accounts) data.accounts = accounts;
       if (duration) data.duration = Number(duration);
 
-      // если уже на шаге 2 — обновим видимость блока аккаунтов
       if (currentStep === 2) {
         const hideAccounts = SPECIAL_PLANS.has(data.plan || "");
         if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
@@ -307,7 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentStep === 1) {
       if (!data.plan) return alert("Пожалуйста, выберите тариф");
-      // 1 -> 2: сбрасываем предыдущий выбор
       resetStep2Selections();
     }
 
@@ -325,7 +310,6 @@ document.addEventListener("DOMContentLoaded", () => {
       currentStep++;
       showStep(currentStep);
     } else {
-      // ШАГ 3 — валидируем e-mail (обязателен)
       const val = emailInput ? String(emailInput.value).trim() : '';
       if (!isValidEmail(val)) {
         if (emailError) emailError.style.display = 'block';
@@ -337,14 +321,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       data.email = val;
 
-      // собираем payload и отправляем (inline-поток)
       const pricing = computeTotal(data.plan, data.accounts, data.duration);
       const payload = { ...data, pricing };
 
       const qid = tg?.initDataUnsafe?.query_id;
       const fromId = tg?.initDataUnsafe?.user?.id;
       if (!qid) {
-        // fallback: если не из inline-кнопки
         try { tg?.sendData(JSON.stringify(payload)); } catch (_) {}
         tg?.close();
         return;
@@ -369,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const blob = new Blob([json], { type: 'application/json' });
         if (!('sendBeacon' in navigator) || !navigator.sendBeacon('/webapp-answer', blob)) {
           alert('Не удалось отправить данные. Проверьте сеть и попробуйте ещё раз.');
-          return; // не закрываем — чтобы можно было повторить
+          return;
         }
         tg?.close();
       }
@@ -386,6 +368,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // рендер 1-го шага
   showStep(currentStep);
+
+  // 💡 Префилл email для старого покупателя из Google Sheets
+  (async () => {
+    const uid = tg?.initDataUnsafe?.user?.id;
+    if (!uid || !emailInput) return;
+    try {
+      const resp = await fetch('/prefill-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: uid })
+      });
+      const j = await resp.json();
+      if (j?.ok && j.email) {
+        emailInput.value = j.email;
+        const evt = new Event('input', { bubbles: true });
+        emailInput.dispatchEvent(evt);
+      }
+    } catch {}
+  })();
 
   // лайв-проверка e-mail
   if (emailInput) {

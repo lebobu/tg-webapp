@@ -1,281 +1,210 @@
 // controllers/telegramController.js
-const chatStore = require('../chatStore');        // если не используете — удалите и вызовы chatStore.*
-const { sendMail } = require('../mailer');        // nodemailer-обёртка (см. mailer.js)
-const { buildOrderEmail } = require('../emailTemplates'); // НОВОЕ: «красивые» HTML-письма
+const chatStore = require('../chatStore');
+const { sendMail } = require('../mailer');
+const { buildOrderEmail } = require('../emailTemplates');
+const { upsertCustomer, appendOrder } = require('../googleSheets');
 
-
-// Опционально: можно задать свою фразу в .env
-// PAYMENT_NOTE="После подтверждения мы пришлём реквизиты..."
+// PAYMENT_NOTE можно задать в .env
 const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
 
-// Блок «Оплата» только для Telegram-сообщений пользователю
 function buildPaymentNote(pricing) {
   const lines = ['', '———', '💳 *Оплата*'];
-  if (pricing?.total != null) {
-    lines.push(`${escMd(pricing.total)} руб.`);
-  }
+  if (pricing?.total != null) lines.push(`${escMd(pricing.total)} руб.`);
   lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail.'));
   return lines.join('\n');
 }
 
-/* ===================== ENV / CONFIG ===================== */
-
-// Telegram-админы (ID через запятую)
 const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || '')
-  .split(/[,\s]+/)
-  .map(x => x.trim())
-  .filter(Boolean);
-
-// Админский e-mail для писем
+  .split(/[,\s]+/).map(x => x.trim()).filter(Boolean);
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').trim();
 
-// Брендовые настройки для HTML-писем
 const BRAND = {
   name: process.env.BRAND_NAME || 'Сервис Вялого Пингвина',
-  logo: process.env.BRAND_LOGO_URL || '',       // URL логотипа (PNG/SVG)
+  logo: process.env.BRAND_LOGO_URL || '',
   primary: process.env.BRAND_PRIMARY || '#0a84ff',
   supportEmail: process.env.SUPPORT_EMAIL || ''
 };
 
-/* ===================== HELPERS ===================== */
+function escMd(s = '') { return String(s).replace(/([_*[\]()~`>#+\-=|{}])/g, '\\$1'); }
+function isValidEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim()); }
+function buildPriceLines(pricing){ return pricing ? [`• *Итого:* ${escMd(pricing.total)} руб.`] : []; }
+function asUsername(u){ const v=(u||'').toString().trim(); return v?('@'+v.replace(/^@/,'')):'none'; }
 
-function escMd(s = '') {
-  // важно: не экранируем точку (.) — иначе в e-mail будет \.
-  return String(s).replace(/([_*[\]()~`>#+\-=|{}])/g, '\\$1');
-}
-function isValidEmail(s) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim());
-}
-
-// Без форматирования и без "Экономии" — только итог
-function buildPriceLines(pricing) {
-  if (!pricing) return [];
-  return [`• *Итого:* ${escMd(pricing.total)} руб.`];
-}
-
-function asUsername(u) {
-  const v = (u || '').toString().trim();
-  return v ? '@' + v.replace(/^@/, '') : 'none';
-}
-
-async function notifyAdmins(bot, lines) {
+async function notifyAdmins(bot, lines){
   if (!ADMIN_IDS.length) return;
   const text = ['🛎 *Новая заявка*', ...lines].join('\n');
-  for (const adminId of ADMIN_IDS) {
-    try {
-      await bot.sendMessage(adminId, text, { parse_mode: 'Markdown' });
-    } catch (e) {
-      console.warn('notifyAdmins failed for', adminId, e.message);
-    }
+  for (const id of ADMIN_IDS) {
+    try { await bot.sendMessage(id, text, { parse_mode: 'Markdown' }); }
+    catch (e) { console.warn('notifyAdmins failed:', id, e.message); }
   }
 }
 
 const SPECIAL_PLANS = new Set(['Роутер', 'Сервер VPS']);
 
-/* ===================== EMAIL SENDER (HTML CARD) ===================== */
-
 async function emailAdminsAndUser({ order }) {
   try {
-    // шаблоны для админа и пользователя
-    const adminTpl = buildOrderEmail({ brand: BRAND, order }).admin;
-    const userTpl = buildOrderEmail({ brand: BRAND, order }).user;
-
-    // админу
-    if (ADMIN_EMAIL) {
-      await sendMail({ to: ADMIN_EMAIL, subject: adminTpl.subject, text: adminTpl.text, html: adminTpl.html });
-    }
-    // пользователю
+    const { admin, user } = buildOrderEmail({ brand: BRAND, order });
+    if (ADMIN_EMAIL) await sendMail({ to: ADMIN_EMAIL, subject: admin.subject, text: admin.text, html: admin.html });
     if (order.email && isValidEmail(order.email)) {
-      await sendMail({ to: order.email, subject: userTpl.subject, text: userTpl.text, html: userTpl.html });
+      await sendMail({ to: order.email, subject: user.subject, text: user.text, html: user.html });
     }
-  } catch (e) {
-    console.warn('emailAdminsAndUser failed:', e.message);
-  }
+  } catch (e) { console.warn('emailAdminsAndUser failed:', e.message); }
 }
-
-/* ===================== CONTROLLER ===================== */
 
 module.exports = (bot) => ({
 
-  // /start — inline-кнопка с web_app (вариант B)
   onStartCommand: async (msg) => {
     const url = process.env.SERVER_URL;
-    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (_) { }
+    try { await chatStore.set(msg.from.id, msg.chat.id); } catch {}
     bot.sendMessage(
       msg.chat.id,
       'Перейти для оформления заказа\nЕсть вопросы — нажмите ❓ в каталоге',
-      {
-        reply_markup: {
-          inline_keyboard: [[{ text: 'Открыть каталог', web_app: { url } }]]
-        }
-      }
+      { reply_markup: { inline_keyboard: [[{ text:'Открыть каталог', web_app:{ url } }]] } }
     );
   },
 
-  // общий listener — обновляем маппинг user→chat на любое сообщение
-  onAnyMessage: async (msg) => {
-    try { await chatStore.set(msg.from.id, msg.chat.id); } catch (_) { }
-  },
+  onAnyMessage: async (msg) => { try { await chatStore.set(msg.from.id, msg.chat.id); } catch {} },
 
-  // /id
-  onIdCommand: (msg) => {
-    bot.sendMessage(msg.chat.id, `Ваш chat_id: ${msg.chat.id}`);
-  },
+  onIdCommand: (msg) => { bot.sendMessage(msg.chat.id, `Ваш chat_id: ${msg.chat.id}`); },
 
-  // webhook
-  onWebhook: (req, res) => {
-    try { bot.processUpdate(req.body); res.sendStatus(200); }
-    catch (e) { console.error('onWebhook error:', e); res.sendStatus(500); }
-  },
+  onWebhook: (req, res) => { try { bot.processUpdate(req.body); res.sendStatus(200); } catch(e){ console.error(e); res.sendStatus(500);} },
 
-  // (опционально) поток /data
+  // Если используете прямой POST /data
   onWebAppData: async (req, res) => {
     try {
-      const { user, platform, form, pricing, email/*, subscribe */} = req.body || {};
-      if (!user?.id) return res.status(400).json({ ok: false, error: 'no user.id' });
+      const { user, platform, form, pricing, email } = req.body || {};
+      if (!user?.id) return res.status(400).json({ ok:false, error:'no user.id' });
 
-      const plan = form?.plan ?? '-';
+      const plan     = form?.plan ?? '-';
       const accounts = form?.accounts ?? '-';
       const duration = form?.duration ?? '-';
       const emailStr = (email || form?.email || '').trim();
-      // const subs = !!subscribe;
 
       const base = [
         `• *Тариф:* ${escMd(plan)}`,
         ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
         `• *Срок:* ${escMd(duration)} мес.`,
         `• *Email:* ${escMd(emailStr || '-')}`,
-        `• *Подписка:* ${subs ? 'включена' : 'нет'}`,
         `• *Платформа:* ${escMd(platform || 'N/A')}`,
         `• *User ID:* ${escMd(user.id)}`
       ];
       const price = buildPriceLines(pricing);
 
-      // пользователю
-      await bot.sendMessage(
-        user.id,
-        ['✅ *Заявка подтверждена*', ...base, ...price].join('\n'),
-        { parse_mode: 'Markdown' }
-      );
+      const userText = ['✅ *Заявка подтверждена*', ...base, ...price, buildPaymentNote(pricing)].join('\n');
+      await bot.sendMessage(user.id, userText, { parse_mode: 'Markdown' });
 
-const usernameVal = (user && user.username) || null;
-// Если хотите подстраховаться:
-try {
-  if (!usernameVal) {
-    const ch = await bot.getChat(user.id);
-    // возьмём из getChat, если не пришёл в апдейте
-    if (ch?.username) usernameVal = ch.username;
-  }
-} catch {}
+      let usernameVal = (user && user.username) || null;
+      try { if (!usernameVal) { const ch = await bot.getChat(user.id); usernameVal = ch?.username || null; } } catch {}
 
-      // админам в Telegram
       await notifyAdmins(bot, [
-        ...base,
-        ...price,
-         `• *Username:* ${escMd(asUsername(usernameVal))}`,   // ← НОВОЕ
-  `• *Chat ID:* ${escMd((await chatStore.get(user.id)) ?? 'none')}`
+        ...base, ...price,
+        `• *Username:* ${escMd(asUsername(usernameVal))}`,
+        `• *Chat ID:* ${escMd((await chatStore.get(user.id)) ?? 'none')}`
       ]);
 
-      // письма админу и пользователю — ИСПОЛЬЗУЕМ НОВЫЙ ШАБЛОН
-      await emailAdminsAndUser({
-        order: {
+      // Google Sheets: апдейт покупателя + запись заказа
+      try {
+        await upsertCustomer({ user_id: user.id, username: usernameVal || '', email: emailStr });
+        await appendOrder({
+          user_id: user.id,
+          username: usernameVal || '',
+          email: emailStr,
           plan,
           accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
           duration,
-          email: emailStr,
-          // subscribe: subs,
-          pricing,
-          userId: user.id,
-          chatId: await chatStore.get(user.id)
-        }
-      });
+          total: pricing?.total,
+          subscribe: false,
+          query_id: '',
+          chat_id: await chatStore.get(user.id) || ''
+        });
+      } catch (e) { console.warn('Sheets save failed:', e.message); }
 
-      res.json({ ok: true });
+      res.json({ ok:true });
     } catch (e) {
       console.error('onWebAppData error:', e);
-      res.status(500).json({ ok: false });
+      res.status(500).json({ ok:false });
     }
   },
 
-  // Вариант B: inline-кнопка → фронт шлёт { query_id, from_id, data }
+  // Inline-поток: { query_id, from_id, data }
   onWebAppAnswer: async (req, res) => {
     try {
       const { query_id, from_id, data } = req.body || {};
-      if (!query_id) return res.status(400).json({ ok: false, error: 'no query_id' });
+      if (!query_id) return res.status(400).json({ ok:false, error:'no query_id' });
 
-      const plan = data?.plan ?? '-';
-      const accounts = data?.accounts ?? '-';
-      const duration = data?.duration ?? '-';
-      const pricing = data?.pricing; // { total, ... }
-      const email = (data?.email || '').trim();
-      // const subscribe = !!data?.subscribe;
+      const plan      = data?.plan ?? '-';
+      const accounts  = data?.accounts ?? '-';
+      const duration  = data?.duration ?? '-';
+      const pricing   = data?.pricing;
+      const email     = (data?.email || '').trim();
 
       const baseLines = [
         '✅ *Заявка подтверждена!*',
         `• *Тариф:* ${escMd(plan)}`,
         ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
         `• *Срок:* ${escMd(duration)} мес.`,
-        `• *Email:* ${escMd(email || '-')}`,
-        // `• *Подписка:* ${subscribe ? 'включена' : 'нет'}`
+        `• *Email:* ${escMd(email || '-')}`
       ];
       const priceLines = buildPriceLines(pricing);
-      // стало: для пользователя добавляем блок «Оплата»
-      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
-      const textForAdmins = [...baseLines, ...priceLines].join('\n'); // админам без блока «Оплата»
-      // 1) Ответ на inline-запрос (сообщение появится в чате)
-      await bot.answerWebAppQuery(query_id, {
-        type: 'article',
-        id: String(Date.now()),
-        title: 'Заявка подтверждена',
-        input_message_content: { message_text: textForUser, parse_mode: 'Markdown' }
-      });
 
-      // 2) Параллельно — обычное сообщение от бота (если знаем chat_id)
-      // 2) дубликат пользователю в ЛС (если знаем chat_id)
+      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
+      // await bot.answerWebAppQuery(query_id, {
+      //   type: 'article',
+      //   id: String(Date.now()),
+      //   title: 'Заявка подтверждена',
+      //   input_message_content: { message_text: textForUser, parse_mode: 'Markdown' }
+      // });
+
       let chatId = null;
       if (from_id) {
-        try {
-          chatId = await chatStore.get(from_id);
-          if (chatId) await bot.sendMessage(chatId, textForUser, { parse_mode: 'Markdown' });
-        } catch (e) {
-          console.warn('sendMessage to user failed:', e.message);
-        }
+        try { chatId = await chatStore.get(from_id); if (chatId) await bot.sendMessage(chatId, textForUser, { parse_mode:'Markdown' }); }
+        catch (e) { console.warn('sendMessage to user failed:', e.message); }
       }
-// ⬇️ ДОБАВИТЬ: пробуем получить username у пользователя
-let usernameVal = null;
-if (from_id) {
-  try {
-    const ch = await bot.getChat(from_id); // сработает, если бот уже видел пользователя
-    usernameVal = ch?.username || null;
-  } catch {}
-}
-      // 3) админам — без блока «Оплата»
+
+      let usernameVal = null;
+      if (from_id) { try { const ch = await bot.getChat(from_id); usernameVal = ch?.username || null; } catch {} }
+
       await notifyAdmins(bot, [
-        ...baseLines,
-        ...priceLines,
-        `• *Username:* ${escMd(asUsername(usernameVal))}`,   // ← НОВОЕ
-        `• *User ID:* ${from_id || '—'}`,
-        `• *Chat ID:* ${chatId || (from_id && await chatStore.get(from_id)) || '—'}`
+        ...baseLines, ...priceLines,
+        `• *Username:* ${escMd(asUsername(usernameVal))}`,
+        `• *User ID:* ${from_id ?? 'none'}`,
+        `• *Chat ID:* ${chatId || (from_id && await chatStore.get(from_id)) || 'none'}`
       ]);
-      
-      // 4) E-mail админу и пользователю — ИСПОЛЬЗУЕМ НОВЫЙ ШАБЛОН
+
+      // Письма
       await emailAdminsAndUser({
         order: {
           plan,
           accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
           duration,
           email,
-          // subscribe,
           pricing,
           userId: from_id,
           chatId
         }
       });
 
-      res.json({ ok: true });
+      // Google Sheets
+      try {
+        await upsertCustomer({ user_id: from_id, username: usernameVal || '', email });
+        await appendOrder({
+          user_id: from_id,
+          username: usernameVal || '',
+          email,
+          plan,
+          accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
+          duration,
+          total: pricing?.total,
+          subscribe: false,
+          query_id,
+          chat_id: chatId || ''
+        });
+      } catch (e) { console.warn('Sheets save failed:', e.message); }
+
+      res.json({ ok:true });
     } catch (e) {
       console.error('answerWebAppQuery error:', e);
-      res.status(500).json({ ok: false });
+      res.status(500).json({ ok:false });
     }
   },
 
