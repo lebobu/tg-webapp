@@ -32,7 +32,7 @@ bot.on('message', telegramController.onAnyMessage); // обновляем мап
 // вебхуки и эндпоинты
 app.post('/telegram-webhook', telegramController.onWebhook);
 app.post('/data', telegramController.onWebAppData);       // опционально
-app.post('/webapp-answer', telegramController.onWebAppAnswer); // inline → answerWebAppQuery
+//app.post('/webapp-answer', telegramController.onWebAppAnswer); // inline → answerWebAppQuery
 
 app.get('/health', (_, res) => res.json({ ok: true }));
 
