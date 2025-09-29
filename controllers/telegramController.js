@@ -148,12 +148,12 @@ module.exports = (bot) => ({
       const priceLines = buildPriceLines(pricing);
 
       const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
-      await bot.answerWebAppQuery(query_id, {
-        type: 'article',
-        id: String(Date.now()),
-        title: 'Заявка подтверждена',
-        input_message_content: { message_text: textForUser, parse_mode: 'Markdown' }
-      });
+      // await bot.answerWebAppQuery(query_id, {
+      //   type: 'article',
+      //   id: String(Date.now()),
+      //   title: 'Заявка подтверждена',
+      //   input_message_content: { message_text: textForUser, parse_mode: 'Markdown' }
+      // });
 
       let chatId = null;
       if (from_id) {
