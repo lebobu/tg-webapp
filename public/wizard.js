@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
       if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
       document.querySelectorAll('.step-2 .btn.option[data-accounts]')
-        .forEach(b => b.classList.toggle('hidden', hideAccounts));
+        .forEach(b => b.classList.toggle("hidden", hideAccounts));
     }
 
     if (step < totalSteps) renderPreview();
@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (accountsGroup) accountsGroup.classList.toggle("hidden", hideAccounts);
         if (accountsLabel) accountsLabel.classList.toggle("hidden", hideAccounts);
         document.querySelectorAll('.step-2 .btn.option[data-accounts]')
-          .forEach(b => b.classList.toggle('hidden', hideAccounts));
+          .forEach(b => b.classList.toggle("hidden", hideAccounts));
       }
 
       renderPreview();
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ---------- кнопки навигации ----------
-  nextBtn?.addEventListener("click", async (e) => {
+  nextBtn?.addEventListener("click", (e) => {
     e.preventDefault();
 
     if (currentStep === 1) {
@@ -309,53 +309,58 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentStep < totalSteps) {
       currentStep++;
       showStep(currentStep);
-    } else {
-      const val = emailInput ? String(emailInput.value).trim() : '';
-      if (!isValidEmail(val)) {
-        if (emailError) emailError.style.display = 'block';
-        if (emailInput) {
-          emailInput.focus();
-          emailInput.style.borderColor = '#c62828';
-        }
-        return;
+      return;
+    }
+
+    // Шаг 3 — подтверждение
+    const val = emailInput ? String(emailInput.value).trim() : '';
+    if (!isValidEmail(val)) {
+      if (emailError) emailError.style.display = 'block';
+      if (emailInput) {
+        emailInput.focus();
+        emailInput.style.borderColor = '#c62828';
       }
-      data.email = val;
+      return;
+    }
+    data.email = val;
 
-      const pricing = computeTotal(data.plan, data.accounts, data.duration);
-      const payload = { ...data, pricing };
+    const pricing = computeTotal(data.plan, data.accounts, data.duration);
+    const payload = { ...data, pricing };
 
-      const qid = tg?.initDataUnsafe?.query_id;
-      const fromId = tg?.initDataUnsafe?.user?.id;
-      if (!qid) {
-        try { tg?.sendData(JSON.stringify(payload)); } catch (_) {}
-        tg?.close();
-        return;
+    const qid = tg?.initDataUnsafe?.query_id;
+    const fromId = tg?.initDataUnsafe?.user?.id;
+
+    // МГНОВЕННОЕ закрытие: отправляем «огрызком» и закрываем, не ждём ответа
+    const json = JSON.stringify({ query_id: qid || '', from_id: fromId || '', data: payload });
+
+    // анти-даблклик
+    nextBtn.disabled = true;
+    nextBtn.classList.add('is-busy');
+
+    const url = '/webapp-answer';
+    const blob = new Blob([json], { type: 'application/json' });
+
+    let sent = false;
+    try {
+      if ('sendBeacon' in navigator) {
+        sent = navigator.sendBeacon(url, blob);
       }
+    } catch {}
 
-      const json = JSON.stringify({ query_id: qid, from_id: fromId, data: payload });
-
+    if (!sent) {
       try {
-        const controller = new AbortController();
-        const t = setTimeout(() => controller.abort(), 8000);
-        const resp = await fetch('/webapp-answer', {
+        // fire-and-forget: без await
+        fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: json,
-          keepalive: true,
-          signal: controller.signal
-        });
-        clearTimeout(t);
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        tg?.close();
-      } catch {
-        const blob = new Blob([json], { type: 'application/json' });
-        if (!('sendBeacon' in navigator) || !navigator.sendBeacon('/webapp-answer', blob)) {
-          alert('Не удалось отправить данные. Проверьте сеть и попробуйте ещё раз.');
-          return;
-        }
-        tg?.close();
-      }
+          keepalive: true
+        }).catch(() => {});
+      } catch {}
     }
+
+    // закрываем почти мгновенно (не ждём сети)
+    setTimeout(() => tg?.close(), 30);
   });
 
   backBtn?.addEventListener("click", (e) => {
