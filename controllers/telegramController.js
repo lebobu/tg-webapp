@@ -58,8 +58,9 @@ module.exports = (bot) => ({
     try { await chatStore.set(msg.from.id, msg.chat.id); } catch {}
     bot.sendMessage(
       msg.chat.id,
-      'Перейти для оформления заказа\nЕсть вопросы — нажмите ❓ в каталоге',
-      { reply_markup: { inline_keyboard: [[{ text:'Открыть каталог', web_app:{ url } }]] } }
+      'Перейдите в Каталог для оформления заказа\nЕсть вопросы — нажмите ❓ в каталоге'
+      // ,
+      // { reply_markup: { inline_keyboard: [[{ text:'Открыть каталог', web_app:{ url } }]] } }
     );
   },
 
