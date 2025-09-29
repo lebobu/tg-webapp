@@ -127,85 +127,85 @@ module.exports = (bot) => ({
   },
 
   // Inline-поток: { query_id, from_id, data }
-  // onWebAppAnswer: async (req, res) => {
-  //   try {
-  //     const { query_id, from_id, data } = req.body || {};
-  //     if (!query_id) return res.status(400).json({ ok:false, error:'no query_id' });
+  onWebAppAnswer: async (req, res) => {
+    try {
+      const { query_id, from_id, data } = req.body || {};
+      if (!query_id) return res.status(400).json({ ok:false, error:'no query_id' });
 
-  //     const plan      = data?.plan ?? '-';
-  //     const accounts  = data?.accounts ?? '-';
-  //     const duration  = data?.duration ?? '-';
-  //     const pricing   = data?.pricing;
-  //     const email     = (data?.email || '').trim();
+      const plan      = data?.plan ?? '-';
+      const accounts  = data?.accounts ?? '-';
+      const duration  = data?.duration ?? '-';
+      const pricing   = data?.pricing;
+      const email     = (data?.email || '').trim();
 
-  //     const baseLines = [
-  //       '✅ *Заявка подтверждена!*',
-  //       `• *Тариф:* ${escMd(plan)}`,
-  //       ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
-  //       `• *Срок:* ${escMd(duration)} мес.`,
-  //       `• *Email:* ${escMd(email || '-')}`
-  //     ];
-  //     const priceLines = buildPriceLines(pricing);
+      const baseLines = [
+        '✅ *Заявка подтверждена!*',
+        `• *Тариф:* ${escMd(plan)}`,
+        ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
+        `• *Срок:* ${escMd(duration)} мес.`,
+        `• *Email:* ${escMd(email || '-')}`
+      ];
+      const priceLines = buildPriceLines(pricing);
 
-  //     const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
-  //     await bot.answerWebAppQuery(query_id, {
-  //       type: 'article',
-  //       id: String(Date.now()),
-  //       title: 'Заявка подтверждена',
-  //       input_message_content: { message_text: textForUser, parse_mode: 'Markdown' }
-  //     });
+      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
+      await bot.answerWebAppQuery(query_id, {
+        type: 'article',
+        id: String(Date.now()),
+        title: 'Заявка подтверждена',
+        input_message_content: { message_text: textForUser, parse_mode: 'Markdown' }
+      });
 
-  //     let chatId = null;
-  //     if (from_id) {
-  //       try { chatId = await chatStore.get(from_id); if (chatId) await bot.sendMessage(chatId, textForUser, { parse_mode:'Markdown' }); }
-  //       catch (e) { console.warn('sendMessage to user failed:', e.message); }
-  //     }
+      let chatId = null;
+      if (from_id) {
+        try { chatId = await chatStore.get(from_id); if (chatId) await bot.sendMessage(chatId, textForUser, { parse_mode:'Markdown' }); }
+        catch (e) { console.warn('sendMessage to user failed:', e.message); }
+      }
 
-  //     let usernameVal = null;
-  //     if (from_id) { try { const ch = await bot.getChat(from_id); usernameVal = ch?.username || null; } catch {} }
+      let usernameVal = null;
+      if (from_id) { try { const ch = await bot.getChat(from_id); usernameVal = ch?.username || null; } catch {} }
 
-  //     await notifyAdmins(bot, [
-  //       ...baseLines, ...priceLines,
-  //       `• *Username:* ${escMd(asUsername(usernameVal))}`,
-  //       `• *User ID:* ${from_id ?? 'none'}`,
-  //       `• *Chat ID:* ${chatId || (from_id && await chatStore.get(from_id)) || 'none'}`
-  //     ]);
+      await notifyAdmins(bot, [
+        ...baseLines, ...priceLines,
+        `• *Username:* ${escMd(asUsername(usernameVal))}`,
+        `• *User ID:* ${from_id ?? 'none'}`,
+        `• *Chat ID:* ${chatId || (from_id && await chatStore.get(from_id)) || 'none'}`
+      ]);
 
-  //     // Письма
-  //     await emailAdminsAndUser({
-  //       order: {
-  //         plan,
-  //         accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
-  //         duration,
-  //         email,
-  //         pricing,
-  //         userId: from_id,
-  //         chatId
-  //       }
-  //     });
+      // Письма
+      await emailAdminsAndUser({
+        order: {
+          plan,
+          accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
+          duration,
+          email,
+          pricing,
+          userId: from_id,
+          chatId
+        }
+      });
 
-  //     // Google Sheets
-  //     try {
-  //       await upsertCustomer({ user_id: from_id, username: usernameVal || '', email });
-  //       await appendOrder({
-  //         user_id: from_id,
-  //         username: usernameVal || '',
-  //         email,
-  //         plan,
-  //         accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
-  //         duration,
-  //         total: pricing?.total,
-  //         subscribe: false,
-  //         query_id,
-  //         chat_id: chatId || ''
-  //       });
-  //     } catch (e) { console.warn('Sheets save failed:', e.message); }
+      // Google Sheets
+      try {
+        await upsertCustomer({ user_id: from_id, username: usernameVal || '', email });
+        await appendOrder({
+          user_id: from_id,
+          username: usernameVal || '',
+          email,
+          plan,
+          accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
+          duration,
+          total: pricing?.total,
+          subscribe: false,
+          query_id,
+          chat_id: chatId || ''
+        });
+      } catch (e) { console.warn('Sheets save failed:', e.message); }
 
-  //     res.json({ ok:true });
-  //   } catch (e) {
-  //     console.error('answerWebAppQuery error:', e);
-  //     res.status(500).json({ ok:false });
-  //   }
-  // },
+      res.json({ ok:true });
+    } catch (e) {
+      console.error('answerWebAppQuery error:', e);
+      res.status(500).json({ ok:false });
+    }
+  },
 
 });
