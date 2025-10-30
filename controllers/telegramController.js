@@ -10,7 +10,7 @@ const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
 function buildPaymentNote(pricing) {
   const lines = ['', '———', '💳 *Оплата*'];
   if (pricing?.total != null) lines.push(`${escMd(pricing.total)} руб.`);
-  lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail.'));
+  lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail'));
   return lines.join('\n');
 }
 
