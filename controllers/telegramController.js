@@ -57,11 +57,18 @@ module.exports = (bot) => ({
     const url = process.env.SERVER_URL;
     try { await chatStore.set(msg.from.id, msg.chat.id); } catch {}
     bot.sendMessage(
-      msg.chat.id,
-      'Перейдите в Каталог для оформления заказа\nЕсть вопросы — нажмите ❓ в каталоге'
-      // ,
-      // { reply_markup: { inline_keyboard: [[{ text:'Открыть каталог', web_app:{ url } }]] } }
-    );
+  msg.chat.id,
+  'Перейдите в Каталог для оформления заказа\n Для получения справки нажмите кнопку ниже или нажмите ❓ в каталоге  👇',
+  {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text:'Открыть каталог', web_app:{ url } }],
+        [{ text:'Открыть помощь', url:'https://polpo-dev.duckdns.org/help.html' }]
+      ]
+    }
+  }
+);
+
   },
 
   onAnyMessage: async (msg) => { try { await chatStore.set(msg.from.id, msg.chat.id); } catch {} },
