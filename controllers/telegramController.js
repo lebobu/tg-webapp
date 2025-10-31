@@ -62,7 +62,7 @@ module.exports = (bot) => ({
   {
     reply_markup: {
       inline_keyboard: [
-        [{ text:'Каталог', web_app:{ url } }],
+        [{ text:'Каталог  ', web_app:{ url } }],
         [{ text:'Помощь❓', url:'https://polpo-dev.duckdns.org/help.html' }]
       ]
     }
