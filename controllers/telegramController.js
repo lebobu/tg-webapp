@@ -62,9 +62,11 @@ module.exports = (bot) => ({
   {
     reply_markup: {
       inline_keyboard: [
-        [{ text:'Каталог 📖', web_app:{ url } }],
-        [{ text:'Помощь ❓', url:'https://polpo-dev.duckdns.org/help.html' }]
+      [
+        { text:'Каталог 📖', web_app:{ url } },
+        { text:'Помощь ❓', url:url + '/help.html'}
       ]
+    ]
     }
   }
 );
