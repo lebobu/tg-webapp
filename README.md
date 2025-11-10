@@ -54,3 +54,5 @@ Pull: Pull
 # v 1.5
 # Control point before email check
 № check deploy.yml 34
+
+# Control point v 1.10
