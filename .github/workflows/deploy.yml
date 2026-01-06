@@ -18,4 +18,4 @@ jobs:
       - name: Deploy dispatch (server forced-command decides)
         run: |
           # передаём имя ветки в SSH_ORIGINAL_COMMAND
-          ssh -o StrictHostKeyChecking=no -i key.pem root@155.212.185.20 "${GITHUB_REF_NAME}"
+          ssh -o StrictHostKeyChecking=no -i key.pem root@155.212.185.20:23432 "${GITHUB_REF_NAME}"
