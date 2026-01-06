@@ -56,3 +56,6 @@ Pull: Pull
 № check deploy.yml 34
 
 # Control point v 1.10
+
+# 06.01.26 - Move to itamare
+# 1
