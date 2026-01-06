@@ -1,24 +1,21 @@
 # .github/workflows/deploy.yml
-name: Deploy to Server
+name: Deploy
 
 on:
   push:
-    branches:
-      - main  # или master
+    branches: [ main, prod ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST_ITAMARE }}
-          username: ${{ secrets.USERNAME_ITAMARE }}
-          key: ${{ secrets.DEPLOY_SSH_KEY_ITAMARE }}
-          port: 23432  # <--- Просто добавьте эту строку
-          script: |
-            cd /var/www/site-dev
-            git pull origin main
-            # Здесь можно добавить команды перезапуска, например:
-            # npm install && pm2 restart all
+      - name: Write SSH key from secret
+        run: |
+          echo "${{ secrets.DEPLOY_SSH_KEY_ITAMARE }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Deploy dispatch (server forced-command decides)
+        run: |
+          # передаём имя ветки в SSH_ORIGINAL_COMMAND
+          ssh -p 23432 -o StrictHostKeyChecking=no -i key.pem root@155.212.185.20 "${GITHUB_REF_NAME}"
