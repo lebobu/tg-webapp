@@ -3,20 +3,19 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, prod ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Deploy to server
+      - name: Write SSH key from secret
         run: |
-          ssh -p 23432 -o StrictHostKeyChecking=no -i key.pem root@155.212.185.20 << EOF
-            cd /var/www/site-dev
-            git fetch origin
-            git checkout main
-            git pull origin main
-            npm ci
-          EOF
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Deploy dispatch (server forced-command decides)
+        run: |
+          # передаём имя ветки в SSH_ORIGINAL_COMMAND
+          ssh -p 23432 -o StrictHostKeyChecking=no -i key.pem root@155.212.185.20 "${GITHUB_REF_NAME}"
