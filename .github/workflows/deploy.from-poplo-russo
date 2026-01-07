@@ -1,0 +1,21 @@
+# .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches: [ main, prod ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write SSH key from secret
+        run: |
+          echo "${{ secrets.DEPLOY_SSH_KEY_ITAMARE }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Deploy dispatch (server forced-command decides)
+        run: |
+          # передаём имя ветки в SSH_ORIGINAL_COMMAND
+          ssh -p 23432 -o StrictHostKeyChecking=no -i key.pem root@155.212.185.20 "${GITHUB_REF_NAME}"
