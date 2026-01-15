@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Link Merger</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; line-height: 1.6; }
+        textarea { width: 100%; height: 80px; margin-bottom: 15px; padding: 10px; box-sizing: border-box; }
+        .result-box { background: #f4f4f4; padding: 15px; border-radius: 5px; border: 1px solid #ccc; word-break: break-all; }
+        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Генератор на основе шаблона</h2>
+
+    <label>1. Ваш шаблон (откуда берем настройки сервера):</label>
+    <textarea id="templateLink" placeholder="vless://... (ссылка с вашим IP, ключами и т.д.)"></textarea>
+
+    <label>2. Донорская ссылка (откуда берем ID и Remark/Описание):</label>
+    <textarea id="donorLink" placeholder="vless://... (ссылка с нужным пользователем)"></textarea>
+
+    <button onclick="mergeLinks()">Сгенерировать ссылку</button>
+
+    <label style="margin-top: 20px;">Результат:</label>
+    <div id="result" class="result-box">Здесь появится новая ссылка...</div>
+
+    <script>
+        function mergeLinks() {
+            const templateStr = document.getElementById('templateLink').value.trim();
+            const donorStr = document.getElementById('donorLink').value.trim();
+
+            try {
+                // Извлекаем UID и Remark из донора
+                // Формат: vless://UUID@host:port...#REMARK
+                const donorParts = donorStr.split('@');
+                const donorUid = donorParts[0].replace('vless://', '');
+                
+                const donorRemarkParts = donorStr.split('#');
+                const donorRemark = donorRemarkParts.length > 1 ? donorRemarkParts[1] : 'New_Config';
+
+                // Извлекаем параметры сервера из шаблона
+                // Нам нужно всё, что идет после @ (адрес, порт, параметры)
+                const templateAfterAt = templateStr.split('@')[1];
+                // Убираем старый remark из шаблона, если он там есть
+                const templatePureConfig = templateAfterAt.split('#')[0];
+
+                // Собираем новую ссылку
+                const finalLink = `vless://${donorUid}@${templatePureConfig}#${donorRemark}`;
+
+                document.getElementById('result').innerText = finalLink;
+            } catch (e) {
+                document.getElementById('result').innerText = "Ошибка: проверьте корректность ссылок. Формат должен начинаться с vless://";
+            }
+        }
+    </script>
+</body>
+</html>
