@@ -113,18 +113,17 @@
 
         <label>1. Ваш шаблон (откуда берем настройки сервера):</label>
         <!-- Используем постоянный шаблон на 01.15.2026   -->
-        <textarea id="templateLink"
-            placeholder="vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru"></textarea>
-        <p style="font-size: 0.8em; color: #999;">
+        <textarea
+            id="templateLink">vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru"></textarea>
+        <!-- <p style="font-size: 0.8em; color: #999;">
             * Текст выше станет виден только при выделении (Ctrl+A или мышкой).
-        </p>
+        </p> -->
 
         <label>2. Донорская ссылка (откуда берем ID и Remark/Описание):</label>
         <textarea id="donorLink" placeholder="link://... (ссылка с новым пингвином)"></textarea>
 
         <div class="controls">
-            <button class="btn-primary" onclick="mergeLinks()">Собрать ссылку</button>
-            <button class="btn-secondary" onclick="generateRandomName()">🎲 Случайный Remark</button>
+            <button class="btn-primary" onclick="generateAndMerge()">Собрать ссылку</button>
         </div>
 
         <label>Текущий Remark (имя):</label>
@@ -172,39 +171,35 @@
             // Вымышленные смешные
             "Шлёпнога", "Зюзлик", "Грымзик", "Буказоид", "Крукозябр", "Бабадук", "Сквонч", "Чебупеля", "Биба", "Боба"
         ];
-        function generateRandomName() {
+        function generateAndMerge() {
+            // 1. Генерируем случайный Remark
             const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
             const char = characters[Math.floor(Math.random() * characters.length)];
-            document.getElementById('remarkField').value = adj + "_" + char.replace(" ", "_");
-        }
+            const num = Math.floor(Math.random() * 99);
+            const newRemark = `${adj}_${char}_${num}`;
 
-        function mergeLinks() {
+            document.getElementById('remarkDisplay').innerText = newRemark;
+
+            // 2. Берем настройки из невидимого поля
             const templateStr = document.getElementById('templateLink').value.trim();
-            const donorStr = document.getElementById('donorLink').value.trim();
-            let remark = document.getElementById('remarkField').value.trim();
-
-            if (!templateStr || !donorStr) {
-                alert("Заполните шаблон и донора!");
-                return;
-            }
 
             try {
-                // Берем UID из донора
-                const donorUid = donorStr.split('@')[0].replace('vless://', '');
+                // Извлекаем UID из постоянного донора
+                const donorUid = donorLinkValue.split('@')[0].replace('vless://', '');
 
-                // Если свой Remark не вписан, пытаемся взять из донора
-                if (!remark) {
-                    const donorRemarkParts = donorStr.split('#');
-                    remark = donorRemarkParts.length > 1 ? donorRemarkParts[1] : 'Generated_User';
-                }
-
-                // Берем всё остальное из шаблона
+                // Извлекаем тело настроек из шаблона
                 const templateBody = templateStr.split('@')[1].split('#')[0];
 
-                const finalLink = `vless://${donorUid}@${templateBody}#${encodeURIComponent(remark)}`;
-                document.getElementById('result').innerText = finalLink;
+                // Собираем итог
+                const finalLink = `vless://${donorUid}@${templateBody}#${encodeURIComponent(newRemark)}`;
+
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerText = finalLink;
+                resultDiv.style.background = "#fff4f4"; // Легкая подсветка при обновлении
+                setTimeout(() => resultDiv.style.background = "#e9ecef", 200);
+
             } catch (e) {
-                document.getElementById('result').innerText = "Ошибка разбора ссылок!";
+                alert("Ошибка в формате шаблона!");
             }
         }
 
