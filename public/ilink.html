@@ -3,105 +3,81 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>VLESS Auto-Generator</title>
+    <title>Пингвин Auto-Gen</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
+            font-family: sans-serif;
+            max-width: 500px;
+            margin: 40px auto;
             padding: 20px;
-            background: #f0f2f5;
+            background: #f4f7f9;
         }
 
         .card {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
         }
 
-        textarea {
+        /* Скрытый текст (белый на белом) */
+        #templateLink {
             width: 100%;
             height: 60px;
-            margin-bottom: 15px;
-            padding: 12px;
-            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #eee;
             border-radius: 8px;
-            resize: vertical;
+            resize: none;
+            background: white;
+            color: white;
             box-sizing: border-box;
+        }
+
+        #templateLink::selection {
+            background: #007bff;
+            color: white;
+        }
+
+        #remarkDisplay {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            display: block;
         }
 
         .result-box {
             background: #e9ecef;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 2px dashed #007bff;
             word-break: break-all;
-            margin-top: 10px;
-            min-height: 40px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 0.9em;
+            cursor: pointer;
         }
 
         button {
-            padding: 10px 18px;
+            width: 100%;
+            padding: 15px;
             cursor: pointer;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-primary {
             background: #007bff;
             color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
         }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-            margin-left: 10px;
-        }
-
-        button:hover {
-            opacity: 0.8;
+        button:active {
+            transform: scale(0.98);
         }
 
         label {
-            font-weight: bold;
-            display: block;
-            margin: 15px 0 5px;
-            color: #333;
-        }
-
-        .controls {
-            display: flex;
-            align-items: center;
-        }
-
-        /* Стиль для скрытого шаблона */
-        #templateLink {
-            width: 100%;
-            height: 80px;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            box-sizing: border-box;
-            resize: vertical;
-
-            /* Секрет: текст белый на белом фоне */
-            background-color: white;
-            color: white;
-            transition: border-color 0.3s;
-        }
-
-        /* Когда мышь над полем, чуть подсветим границы, чтобы было видно, где выделять */
-        #templateLink:hover {
-            border-color: #007bff;
-        }
-
-        /* При выделении браузер сам подсветит текст синим фоном */
-        #templateLink::selection {
-            background: #007bff;
-            color: white;
+            font-size: 0.8em;
+            color: #666;
         }
     </style>
 </head>
@@ -109,33 +85,24 @@
 <body>
 
     <div class="card">
-        <h2>Генератор на основе шаблона</h2>
-
-        <label>1. Ваш шаблон (откуда берем настройки сервера):</label>
-        <!-- Используем постоянный шаблон на 01.15.2026   -->
+        <label>Настройки шаблона (выделите, чтобы увидеть):</label>
         <textarea
-            id="templateLink">vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru"></textarea>
-        <!-- <p style="font-size: 0.8em; color: #999;">
-            * Текст выше станет виден только при выделении (Ctrl+A или мышкой).
-        </p> -->
+            id="templateLink">vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru</textarea>
 
-        <label>2. Донорская ссылка (откуда берем ID и Remark/Описание):</label>
-        <textarea id="donorLink" placeholder="link://... (ссылка с новым пингвином)"></textarea>
-
-        <div class="controls">
-            <button class="btn-primary" onclick="generateAndMerge()">Собрать ссылку</button>
+        <div style="margin: 20px 0; text-align: center;">
+            <label>Текущее имя:</label>
+            <span id="remarkDisplay">---</span>
+            <button class="btn-primary" onclick="generateAndMerge()">Собрать новую ссылку</button>
         </div>
 
-        <label>Текущий Remark (имя):</label>
-        <input type="text" id="remarkField"
-            style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"
-            placeholder="Имя для конфига">
-
-        <label>Результат:</label>
-        <div id="result" class="result-box">Готовая ссылка появится здесь...</div>
+        <label>Готовая ссылка (кликните, чтобы скопировать):</label>
+        <div id="result" class="result-box" onclick="copyResult()">Нажмите кнопку...</div>
     </div>
 
     <script>
+        // Постоянная ссылка донора (откуда берем UID)
+        const donorLinkValue = "vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru";
+
         const adjectives = [
             "Анонимный", "Безумный", "Криптовый", "Железный", "Шпионский", "Быстрый", "Скрытный", "Веселый", "Цифровой", "Космический",
             "Удачливый", "Грозный", "Реактивный", "Пьяный", "Глючный", "Злой", "Сонный", "Золотой", "Подпольный", "Кибернетический",
@@ -171,6 +138,7 @@
             // Вымышленные смешные
             "Шлёпнога", "Зюзлик", "Грымзик", "Буказоид", "Крукозябр", "Бабадук", "Сквонч", "Чебупеля", "Биба", "Боба"
         ];
+
         function generateAndMerge() {
             // 1. Генерируем случайный Remark
             const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
@@ -203,11 +171,11 @@
             }
         }
 
-        function copyToClipboard() {
-            const resultText = document.getElementById('result').innerText;
-            if (resultText && resultText !== "Готовая ссылка появится здесь...") {
-                navigator.clipboard.writeText(resultText);
-                alert("Ссылка скопирована!");
+        function copyResult() {
+            const text = document.getElementById('result').innerText;
+            if (text && text !== "Нажмите кнопку...") {
+                navigator.clipboard.writeText(text);
+                alert("Скопировано в буфер!");
             }
         }
     </script>
