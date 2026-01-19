@@ -1,185 +1,143 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <title>Пингвин Auto-Gen</title>
     <style>
-        body {
-            font-family: sans-serif;
-            max-width: 500px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #f4f7f9;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Скрытый текст (белый на белом) */
+        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f0f2f5; color: #333; }
+        .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        
+        /* Скрытые поля: текст белый на белом */
         #templateLink {
-            width: 100%;
-            height: 60px;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            resize: none;
-            background: white;
-            color: white;
-            box-sizing: border-box;
+            width: 100%; height: 60px; margin: 8px 0 15px; padding: 12px;
+            border: 1px solid #eee; border-radius: 10px; resize: none;
+            background: white; color: white; box-sizing: border-box;
+            font-size: 0.8em; transition: border-color 0.3s;
+        }
+        textarea:hover { border-color: #007bff; }
+        textarea::selection { background: #007bff; color: white; }
+        
+        label { font-size: 0.85em; color: #666; font-weight: 600; margin-left: 5px; }
+        
+        .remark-tag { 
+            display: inline-block; padding: 4px 12px; background: #e7f1ff; 
+            color: #007bff; border-radius: 20px; font-weight: bold; margin-bottom: 15px;
         }
 
-        #templateLink::selection {
-            background: #007bff;
-            color: white;
+        button { 
+            width: 100%; padding: 16px; cursor: pointer; background: #007bff; 
+            color: white; border: none; border-radius: 12px; font-size: 1.1em; font-weight: bold;
+            transition: background 0.2s;
         }
-
-        #remarkDisplay {
-            font-weight: bold;
-            color: #007bff;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            display: block;
+        button:hover { background: #0056b3; }
+        button:active { transform: scale(0.99); }
+        
+        .result-box { 
+            background: #f8f9fa; padding: 15px; border-radius: 10px; 
+            border: 2px dashed #cbd5e0; word-break: break-all; margin-top: 25px;
+            font-family: monospace; cursor: pointer; text-align: center;
         }
-
-        .result-box {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px dashed #007bff;
-            word-break: break-all;
-            margin-top: 20px;
-            font-family: monospace;
-            font-size: 0.9em;
-            cursor: pointer;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            cursor: pointer;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: bold;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        label {
-            font-size: 0.8em;
-            color: #666;
-        }
+        .result-box:hover { border-color: #007bff; background: #fff; }
     </style>
 </head>
-
 <body>
 
-    <div class="card">
-        <label>Настройки шаблона (выделите, чтобы увидеть):</label>
-        <textarea
-            id="templateLink">vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru</textarea>
+<div class="card">
+    <label>Шаблон сервера (выделите для чтения):</label>
+    <textarea id="templateLink">vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru</textarea>
 
-        <div style="margin: 20px 0; text-align: center;">
-            <label>Текущее имя:</label>
-            <span id="remarkDisplay">---</span>
-            <button class="btn-primary" onclick="generateAndMerge()">Собрать новую ссылку</button>
+    <label>Пингвин:</label>
+    <textarea id="donorLink">xxx</textarea>
+
+    <div style="text-align: center; margin-top: 10px;">
+        <div id="remarkArea" style="display:none">
+            <label>Имя:</label><br>
+            <span class="remark-tag" id="remarkDisplay"></span>
         </div>
-
-        <label>Готовая ссылка (кликните, чтобы скопировать):</label>
-        <div id="result" class="result-box" onclick="copyResult()">Нажмите кнопку...</div>
+        <button onclick="generate()">Собрать ссылку</button>
     </div>
 
-    <script>
-        // Постоянная ссылка донора (откуда берем UID)
-        const donorLinkValue = "vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru";
+    <div id="result" class="result-box" onclick="copyResult()">Результат появится здесь...</div>
+</div>
 
+<script>
         const adjectives = [
-            "Анонимный", "Безумный", "Криптовый", "Железный", "Шпионский", "Быстрый", "Скрытный", "Веселый", "Цифровой", "Космический",
-            "Удачливый", "Грозный", "Реактивный", "Пьяный", "Глючный", "Злой", "Сонный", "Золотой", "Подпольный", "Кибернетический",
-            "Квантовый", "Облачный", "Пиксельный", "Вакуумный", "Ламповый", "Олдскульный", "Токсичный", "Плюшевый", "Бронированный", "Дикий",
-            "Невидимый", "Громкий", "Тайный", "Межгалактический", "Сверхзвуковой", "Атомный", "Магнитный", "Электрический", "Кислотный", "Мятный",
-            "Бородатый", "Лысый", "Хитрый", "Жадный", "Справедливый", "Голодный", "Сытый", "Умный", "Глупый", "Дерзкий",
-            "Дедлайновый", "Багнутый", "Оптимизированный", "Виртуальный", "Синтетический", "Ретроградный", "Эпический", "Легендарный", "Мифический", "Пафосный",
-            "Бюджетный", "Элитный", "Стрёмный", "Чёткий", "Мутный", "Драйвовый", "Медленный", "Тормозной", "Бешеный", "Летающий",
-            "Подводный", "Грибовидный", "Зефирный", "Стеклянный", "Картонный", "Резиновый", "Чугунный", "Медный", "Титановый", "Алмазный",
-            "Фантомный", "Призрачный", "Хаотичный", "Стабильный", "Взрывной", "Подозрительный", "Пушистый", "Колючий", "Скользкий", "Липкий",
-            "Глокий", "Куздрявый", "Мямликовый", "Шлёпногий", "Зюзевый", "Бульдозеровый", "Флюктуационный", "Дырокольный", "Зазаборный", "Чебурашковый"
+            // Латинские (Древний Рим)
+            "Magnificus", "Augustus", "Invictus", "Divinus", "Aureus", "Supremus", "Gloriosus", "Nobilis", "Antiquus", "Aeternus",
+            "Imperiosus", "Superbus", "Validus", "Celestus", "Optimus", "Severus", "Pius", "Felix", "Fortis", "Sanctus",
+            // Итальянские (эмоциональные)
+            "Furbo", "Pazzesco", "Curioso", "Stupendo", "Brillante", "Veloce", "Misterioso", "Allegro", "Saggio", "Gagliardo",
+            "Frizzante", "Ruspante", "Selvaggio", "Tosto", "Morbido", "Piccante", "Dolce", "Bello", "Cattivo", "Famoso",
+            "Ignoto", "Vero", "Falso", "Sacro", "Profano", "Umano", "Bestiale", "Buffo", "Losco", "Svelto",
+            "Astuto", "Pigro", "Ingordo", "Matto", "Barocco", "Classico", "Sonoro", "Vibrante", "Acuto", "Grave",
+            "Rapido", "Lento", "Caldo", "Freddo", "Secco", "Fresco", "Ardito", "Fiero", "Onesto", "Puro",
+            // Дополнительные латинские
+            "Albus", "Niger", "Rubrus", "Altus", "Humilis", "Grandis", "Brevis", "Leve", "Gravis", "Solus",
+            "Totus", "Unus", "Primus", "Verus", "Novus", "Liber", "Aequus", "Beatus", "Clarus", "Dignus",
+            "Durus", "Latus", "Longus", "Mirus", "Planus", "Plenus", "Rectus", "Serenus", "Vividus", "Vocalis",
+            "Rapidissimus", "Amicus", "Benignus", "Tidus", "Audax", "Ferox", "Loxus", "Vagus", "Uber", "Memor"
         ];
+
         const characters = [
-            // Знаменитости и личности
-            "Гослинг", "Стетхем", "Кейдж", "Цукерберг", "Дуров", "Маск", "Эйнштейн", "Тесла", "Джобс", "Гейтс",
-            "Канье", "Эминем", "Шакур", "Тайсон", "Али", "Месси", "Роналду", "Хасбик", "Мэддисон", "Папич",
-
-            // Кино и мультфильмы
-            "Бэтмен", "Джокер", "Танос", "Локи", "Тор", "Шрек", "Нео", "Морфеус", "Терминатор", "Гэндальф",
-            "Фродо", "Голлум", "Арагорн", "Саурон", "Шерлок", "Ватсон", "Хаус", "Декстер", "Ганнибал", "Рик",
-            "Морти", "Бендер", "Гомер", "Картман", "Пикачу", "Наруто", "Саске", "Спанчбоб", "Патрик", "Сквидвард",
-            "Штирлиц", "Борн", "Бонд", "Йода", "Вейдер", "Леголас", "Гримли", "Гринч", "Стич", "Рататуй",
-
-            // Мемы и интернет-персонажи
-            "Доге", "Чад", "Гигачад", "Скуф", "Альтушка", "Ждун", "Рикардо", "Гарольд", "Огр", "Гном",
-            "Тролль", "Хакер", "Админ", "Аноним", "Вайпер", "Скрипт", "Бот", "Вирус", "Троян", "Киборг",
-
-            // Существа и предметы
-            "Енот", "Хомяк", "Барсук", "Крот", "Утконос", "Ленивец", "Дракон", "Единорог", "Зомби", "Вампир",
-            "Пират", "Ниндзя", "Самурай", "Викинг", "Ковбой", "Рыцарь", "Пельмень", "Чебурек", "Кактус", "Кирпич",
-            "Чайник", "Утюг", "Пылесос", "Метеор", "Фантом", "Призрак", "Мутант", "Пришелец", "Андроид", "Демон",
-
-            // Вымышленные смешные
-            "Шлёпнога", "Зюзлик", "Грымзик", "Буказоид", "Крукозябр", "Бабадук", "Сквонч", "Чебупеля", "Биба", "Боба"
+            // Древний Рим (Личности)
+            "Caesar", "Augustus", "Nero", "Caligula", "Cicero", "Seneca", "Spartacus", "Brutus", "Pompeius", "Crassus",
+            "Hadrianus", "Traianus", "Commodus", "Romulus", "Remus", "Scipio", "Hannibal", "Agrippa", "Tiberius", "Cato",
+            // Эпоха Возрождения
+            "Leonardo", "Michelangelo", "Raffaello", "Donatello", "Machiavelli", "Galileo", "Botticelli", "Borgia", "Medici", "Caravaggio",
+            "Dante", "Petrarca", "Boccaccio", "Brunelleschi", "Bernini", "Tiziano", "Vivaldi", "Paganini", "Stradivari", "Cellini",
+            // Знаменитости и культура
+            "Celentano", "Fellini", "Mastroianni", "Loren", "Bellucci", "Pavarotti", "Bocelli", "Ramazzotti", "Cutugno", "Caruso",
+            "Toto", "Fantozzi", "Berlusconi", "Rossi", "Ferrari", "Lamborghini", "Gucci", "Prada", "Armani", "Versace",
+            "Pasolini", "Visconti", "Benigni", "Sorrentino", "Morricone", "Zucchero", "Jovanotti", "Casanova", "Romeo", "Pinocchio",
+            // Существительные (Еда и предметы - ед. число)
+            "Pizza", "Pasta", "Gelato", "Espresso", "Cannolo", "Raviolo", "Lasagna", "Pesto", "Grappa", "Prosecco",
+            "Mafioso", "Gladiatore", "Centurione", "Senatore", "Papa", "Cardinale", "Gondoliere", "Pizzaiolo", "Bambino", "Mascalzone",
+            "Vesuvio", "Colosseo", "Duomo", "Gondola", "Vespa", "Fiat", "Biscotto", "Tiramisu", "Mozzarella", "Gorgonzola",
+            "Panettone", "Capitolo", "Vaticano", "Tevere", "Arno", "Forum", "Palatino", "Quirinale", "Garibaldi", "Duce"
         ];
 
-        function generateAndMerge() {
-            // 1. Генерируем случайный Remark
+    function generate() {
+        const templateInput = document.getElementById('templateLink').value.trim();
+        const donorInput = document.getElementById('donorLink').value.trim();
+        
+        if(!templateInput || !donorInput) return alert("Заполните оба поля!");
+
+        try {
+            // Извлекаем UID из донора
+            const uid = donorInput.split('@')[0].replace('vless://', '');
+            
+            // Извлекаем настройки из шаблона (все между @ и #)
+            const config = templateInput.split('@')[1].split('#')[0];
+
+            // Генерируем имя
             const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
             const char = characters[Math.floor(Math.random() * characters.length)];
             const num = Math.floor(Math.random() * 99);
-            const newRemark = `${adj}_${char}_${num}`;
+            const remark = `${adj}_${char}_${num}`;
 
-            document.getElementById('remarkDisplay').innerText = newRemark;
+            // Вывод
+            document.getElementById('remarkDisplay').innerText = remark;
+            document.getElementById('remarkArea').style.display = 'block';
+            
+            const finalLink = `vless://${uid}@${config}#${encodeURIComponent(remark)}`;
+            document.getElementById('result').innerText = finalLink;
 
-            // 2. Берем настройки из невидимого поля
-            const templateStr = document.getElementById('templateLink').value.trim();
-
-            try {
-                // Извлекаем UID из постоянного донора
-                const donorUid = donorLinkValue.split('@')[0].replace('vless://', '');
-
-                // Извлекаем тело настроек из шаблона
-                const templateBody = templateStr.split('@')[1].split('#')[0];
-
-                // Собираем итог
-                const finalLink = `vless://${donorUid}@${templateBody}#${encodeURIComponent(newRemark)}`;
-
-                const resultDiv = document.getElementById('result');
-                resultDiv.innerText = finalLink;
-                resultDiv.style.background = "#fff4f4"; // Легкая подсветка при обновлении
-                setTimeout(() => resultDiv.style.background = "#e9ecef", 200);
-
-            } catch (e) {
-                alert("Ошибка в формате шаблона!");
-            }
+        } catch (e) {
+            alert("Ошибка в формате ссылок. Проверьте наличие @ и vless://");
         }
+    }
 
-        function copyResult() {
-            const text = document.getElementById('result').innerText;
-            if (text && text !== "Нажмите кнопку...") {
-                navigator.clipboard.writeText(text);
-                alert("Скопировано в буфер!");
-            }
+    function copyResult() {
+        const text = document.getElementById('result').innerText;
+        if (text && text.includes('vless://')) {
+            navigator.clipboard.writeText(text);
+            const box = document.getElementById('result');
+            const originalText = box.innerText;
+            box.innerText = "СКОПИРОВАНО!";
+            setTimeout(() => box.innerText = originalText, 1000);
         }
-    </script>
+    }
+</script>
 
 </body>
-
 </html>
