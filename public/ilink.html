@@ -1,66 +1,134 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <title>Пингвин Auto-Gen</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f0f2f5; color: #333; }
-        .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        
-        /* Скрытые поля: текст белый на белом */
-        #templateLink {
-            width: 100%; height: 60px; margin: 8px 0 15px; padding: 12px;
-            border: 1px solid #eee; border-radius: 10px; resize: none;
-            background: white; color: white; box-sizing: border-box;
-            font-size: 0.8em; transition: border-color 0.3s;
-        }
-        textarea:hover { border-color: #007bff; }
-        textarea::selection { background: #007bff; color: white; }
-        
-        label { font-size: 0.85em; color: #666; font-weight: 600; margin-left: 5px; }
-        
-        .remark-tag { 
-            display: inline-block; padding: 4px 12px; background: #e7f1ff; 
-            color: #007bff; border-radius: 20px; font-weight: bold; margin-bottom: 15px;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f0f2f5;
+            color: #333;
         }
 
-        button { 
-            width: 100%; padding: 16px; cursor: pointer; background: #007bff; 
-            color: white; border: none; border-radius: 12px; font-size: 1.1em; font-weight: bold;
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Скрытые поля: текст белый на белом */
+
+        textarea {
+            width: 100%;
+            height: 60px;
+            margin: 8px 0 15px;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            resize: none;
+        }
+
+        #templateLink {
+            background: white;
+            color: white;
+            box-sizing: border-box;
+            font-size: 0.8em;
+            transition: border-color 0.3s;
+        }
+
+        textarea:hover {
+            border-color: #007bff;
+        }
+
+        textarea::selection {
+            background: #007bff;
+            color: white;
+        }
+
+        label {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .remark-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e7f1ff;
+            color: #007bff;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
             transition: background 0.2s;
         }
-        button:hover { background: #0056b3; }
-        button:active { transform: scale(0.99); }
-        
-        .result-box { 
-            background: #f8f9fa; padding: 15px; border-radius: 10px; 
-            border: 2px dashed #cbd5e0; word-break: break-all; margin-top: 25px;
-            font-family: monospace; cursor: pointer; text-align: center;
+
+        button:hover {
+            background: #0056b3;
         }
-        .result-box:hover { border-color: #007bff; background: #fff; }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px dashed #cbd5e0;
+            word-break: break-all;
+            margin-top: 25px;
+            font-family: monospace;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .result-box:hover {
+            border-color: #007bff;
+            background: #fff;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="card">
-    <label>Шаблон сервера (выделите для чтения):</label>
-    <textarea id="templateLink">vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru</textarea>
+    <div class="card">
+        <label>Шаблон:</label>
+        <textarea
+            id="templateLink">vless://ac3420hg-4319-1234-5678-4e13a9876e3d@itamare.ru:443?encryption=none&security=tls&type=ws&host=itamare.ru&path=/notification/ws/&sni=itamare.ru#itamare-ru</textarea>
 
-    <label>Пингвин:</label>
-    <textarea id="donorLink">xxx</textarea>
+        <label>Пингвин:</label>
+        <textarea id="donorLink">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</textarea>
 
-    <div style="text-align: center; margin-top: 10px;">
-        <div id="remarkArea" style="display:none">
-            <label>Имя:</label><br>
-            <span class="remark-tag" id="remarkDisplay"></span>
+        <div style="text-align: center; margin-top: 10px;">
+            <div id="remarkArea" style="display:none">
+                <label>Имя:</label><br>
+                <span class="remark-tag" id="remarkDisplay"></span>
+            </div>
+            <button onclick="generate()">Собрать ссылку</button>
         </div>
-        <button onclick="generate()">Собрать ссылку</button>
+
+        <div id="result" class="result-box" onclick="copyResult()">Результат появится здесь...</div>
     </div>
 
-    <div id="result" class="result-box" onclick="copyResult()">Результат появится здесь...</div>
-</div>
-
-<script>
+    <script>
         const adjectives = [
             // Латинские (Древний Рим)
             "Magnificus", "Augustus", "Invictus", "Divinus", "Aureus", "Supremus", "Gloriosus", "Nobilis", "Antiquus", "Aeternus",
@@ -96,48 +164,54 @@
             "Panettone", "Capitolo", "Vaticano", "Tevere", "Arno", "Forum", "Palatino", "Quirinale", "Garibaldi", "Duce"
         ];
 
-    function generate() {
-        const templateInput = document.getElementById('templateLink').value.trim();
-        const donorInput = document.getElementById('donorLink').value.trim();
-        
-        if(!templateInput || !donorInput) return alert("Заполните оба поля!");
+        function generate() {
+            const templateInput = document.getElementById('templateLink').value.trim();
+            const donorInput = document.getElementById('donorLink').value.trim();
 
-        try {
-            // Извлекаем UID из донора
-            const uid = donorInput.split('@')[0].replace('vless://', '');
-            
-            // Извлекаем настройки из шаблона (все между @ и #)
-            const config = templateInput.split('@')[1].split('#')[0];
+            if (!templateInput || !donorInput) return alert("Заполните оба поля!");
 
-            // Генерируем имя
-            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-            const char = characters[Math.floor(Math.random() * characters.length)];
-            const num = Math.floor(Math.random() * 99);
-            const remark = `${adj}_${char}_${num}`;
+            try {
+                // Извлекаем UID из донора
+                const uid = donorInput.split('@')[0].replace('vless://', '');
 
-            // Вывод
-            document.getElementById('remarkDisplay').innerText = remark;
-            document.getElementById('remarkArea').style.display = 'block';
-            
-            const finalLink = `vless://${uid}@${config}#${encodeURIComponent(remark)}`;
-            document.getElementById('result').innerText = finalLink;
+                // Извлекаем настройки из шаблона (все между @ и #)
+                const config = templateInput.split('@')[1].split('#')[0];
 
-        } catch (e) {
-            alert("Ошибка в формате ссылок. Проверьте наличие @ и vless://");
+                // Генерация даты DDMM
+                const now = new Date();
+                const dd = String(now.getDate()).padStart(2, '0');
+                const mm = String(now.getMonth() + 1).padStart(2, '0'); // Месяцы в JS с 0
+                const datePostfix = dd + mm;
+
+                // Генерация имени
+                const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+                const char = characters[Math.floor(Math.random() * characters.length)];
+                const remark = `${adj}_${char}_${datePostfix}`;
+
+                // Вывод
+                document.getElementById('remarkDisplay').innerText = remark;
+                document.getElementById('remarkArea').style.display = 'block';
+
+                const finalLink = `vless://${uid}@${config}#${encodeURIComponent(remark)}`;
+                document.getElementById('result').innerText = finalLink;
+
+            } catch (e) {
+                alert("Ошибка в формате ссылок. Проверьте наличие @ и протокола://");
+            }
         }
-    }
 
-    function copyResult() {
-        const text = document.getElementById('result').innerText;
-        if (text && text.includes('vless://')) {
-            navigator.clipboard.writeText(text);
-            const box = document.getElementById('result');
-            const originalText = box.innerText;
-            box.innerText = "СКОПИРОВАНО!";
-            setTimeout(() => box.innerText = originalText, 1000);
+        function copyResult() {
+            const text = document.getElementById('result').innerText;
+            if (text && text.includes('vless://')) {
+                navigator.clipboard.writeText(text);
+                const box = document.getElementById('result');
+                const originalText = box.innerText;
+                box.innerText = "СКОПИРОВАНО!";
+                setTimeout(() => box.innerText = originalText, 1000);
+            }
         }
-    }
-</script>
+    </script>
 
 </body>
+
 </html>
