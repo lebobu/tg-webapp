@@ -158,7 +158,7 @@ module.exports = (bot) => ({
       const priceLines = buildPriceLines(pricing);
       const paymentDetails = 'Здесь детали по оплате и справке';
 
-      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
+      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing), ...paymentDetails].join('\n');
       // await bot.answerWebAppQuery(query_id, {
       //   type: 'article',
       //   id: String(Date.now()),
