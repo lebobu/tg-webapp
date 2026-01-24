@@ -156,6 +156,7 @@ module.exports = (bot) => ({
         `• *Email:* ${escMd(email || '-')}`
       ];
       const priceLines = buildPriceLines(pricing);
+      const paymentDetails = 'Здесь детали по оплате и справке';
 
       const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
       // await bot.answerWebAppQuery(query_id, {
