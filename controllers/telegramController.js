@@ -105,7 +105,7 @@ module.exports = (bot) => ({
         `• *User ID:* ${escMd(user.id)}`
       ];
       const price = buildPriceLines(pricing);
-      const userText = ['✅ *Заявка подтверждена*', ...base, ...price, buildPaymentNote(pricing), buildUserExtraText()].join('\n');
+      const userText = ['✅ *Заявка подтверждена*', ...base, ...price, /*buildPaymentNote(pricing),*/ buildUserExtraText()].join('\n');
       await bot.sendMessage(user.id, userText, { parse_mode: 'Markdown' });
 
       let usernameVal = (user && user.username) || null;
@@ -161,7 +161,7 @@ module.exports = (bot) => ({
         `• *Email:* ${escMd(email || '-')}`
       ];
       const priceLines = buildPriceLines(pricing);
-      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing),buildUserExtraText()].join('\n');
+      const textForUser = [...baseLines, ...priceLines, /*buildPaymentNote(pricing),*/buildUserExtraText()].join('\n');
       // await bot.answerWebAppQuery(query_id, {
       //   type: 'article',
       //   id: String(Date.now()),
