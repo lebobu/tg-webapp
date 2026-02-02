@@ -6,7 +6,14 @@ const { upsertCustomer, appendOrder } = require('../googleSheets');
 
 // PAYMENT_NOTE можно задать в .env
 //const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
-const UserExtraText = ['Переводом СБП '`+79957979609'` или по номеру банковской карты '`5536090318609271'` == Совкомбанк == Владимир А '].join('\n');
+const UserExtraText = [
+  '💳 *Оплата*',
+  `Переводом СБП ${mdCode('79957979609')}`,
+  `или по номеру банковской карты ${mdCode('5536 0903 1860 9271')}`,
+  'Совкомбанк',
+  'Получатель: Владимир А'
+].join('\n');
+
 
 function buildPaymentNote(pricing) {
   const lines = ['', '———', '💳 *Оплата*'];
@@ -17,7 +24,11 @@ function buildPaymentNote(pricing) {
 
 function buildUserExtraText() {
   if (!UserExtraText) return '';
-  return ['','———', escMd(UserExtraText)].join('\n');
+  return ['','———', UserExtraText].join('\n');
+}
+
+function mdCode(s = '') {
+  return '`' + String(s).replace(/`/g, '') + '`';
 }
 
 const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || '')
