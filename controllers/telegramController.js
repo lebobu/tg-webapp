@@ -8,19 +8,22 @@ const { upsertCustomer, appendOrder } = require('../googleSheets');
 //const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
 const UserExtraText = [
   '💳 *Оплата*',
-  `Переводом СБП', mdBoldCode('79957979609'),
-  `или по номеру банковской карты', mdBoldCode('5536090318609271'),
+  'Переводом СБП ',
+  mdBoldCode('79957979609'),
+  'или по номеру банковской карты ',
+  mdBoldCode('5536090318609271'),
   'Совкомбанк',
   'Получатель: Владимир А'
 ].join('\n');
 
 
-function buildPaymentNote(pricing) {
-  const lines = ['', '———', '💳 *Оплата*'];
-  if (pricing?.total != null) lines.push(`${escMd(pricing.total)} руб.`);
-  lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail'));
-  return lines.join('\n');
-}
+
+// function buildPaymentNote(pricing) {
+//   const lines = ['', '———', '💳 *Оплата*'];
+//   if (pricing?.total != null) lines.push(`${escMd(pricing.total)} руб.`);
+//   lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail'));
+//   return lines.join('\n');
+// }
 
 function buildUserExtraText() {
   if (!UserExtraText) return '';
