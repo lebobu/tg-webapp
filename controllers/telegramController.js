@@ -8,8 +8,8 @@ const { upsertCustomer, appendOrder } = require('../googleSheets');
 //const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
 const UserExtraText = [
   '💳 *Оплата*',
-  `Переводом СБП ${mdCode(*'79957979609'*)}`,
-  `или по номеру банковской карты ${mdCode(*'5536 0903 1860 9271'*)}`,
+  `Переводом СБП', mdBoldCode('79957979609'),
+  `или по номеру банковской карты', mdBoldCode('5536090318609271'),
   'Совкомбанк',
   'Получатель: Владимир А'
 ].join('\n');
@@ -27,8 +27,12 @@ function buildUserExtraText() {
   return ['','———', UserExtraText].join('\n');
 }
 
-function mdCode(s = '') {
-  return '`' + String(s).replace(/`/g, '') + '`';
+// function mdCode(s = '') {
+//   return '`' + String(s).replace(/`/g, '') + '`';
+// }
+
+function mdBoldCode(s = '') {
+  return '*`' + String(s).replace(/`/g, '') + '`*';
 }
 
 const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || '')
