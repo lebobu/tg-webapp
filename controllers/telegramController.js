@@ -5,7 +5,7 @@ const { buildOrderEmail } = require('../emailTemplates');
 const { upsertCustomer, appendOrder } = require('../googleSheets');
 
 // PAYMENT_NOTE можно задать в .env
-const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
+//const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
 const UserExtraText = 'Переводом СБП '`+79957979609'` или по номеру банковской карты '`5536090318609271'` == Совкомбанк == Владимир А '.trim();
 
 function buildPaymentNote(pricing) {
