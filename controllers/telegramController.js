@@ -5,13 +5,38 @@ const { buildOrderEmail } = require('../emailTemplates');
 const { upsertCustomer, appendOrder } = require('../googleSheets');
 
 // PAYMENT_NOTE можно задать в .env
-const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
+//const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
+const UserExtraText = [
+  '💳 *Оплата*',
+  'Переводом СБП ',
+  mdBoldCode('+79957979609'),
+  'или по номеру банковской карты ',
+  mdBoldCode('5536090318609271'),
+  'Совкомбанк',
+  'Получатель: Владимир А'
+].join('\n');
 
-function buildPaymentNote(pricing) {
-  const lines = ['', '———', '💳 *Оплата*'];
-  if (pricing?.total != null) lines.push(`${escMd(pricing.total)} руб.`);
-  lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail'));
-  return lines.join('\n');
+
+
+// function buildPaymentNote(pricing) {
+//   const lines = ['', '———', '💳 *Оплата*'];
+//   if (pricing?.total != null) lines.push(`${escMd(pricing.total)} руб.`);
+//   lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail'));
+//   return lines.join('\n');
+// }
+
+function buildUserExtraText() {
+  if (!UserExtraText) return '';
+  return ['','———', UserExtraText].join('\n');
+}
+
+// function mdCode(s = '') {
+//   return '`' + String(s).replace(/`/g, '') + '`';
+// }
+
+function mdBoldCode(s = '') {
+  // return '*`' + String(s).replace(/`/g, '') + '`*';
+  return '*' + String(s).replace(/`/g, '') + '*';
 }
 
 const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || '')
@@ -99,8 +124,7 @@ module.exports = (bot) => ({
         `• *User ID:* ${escMd(user.id)}`
       ];
       const price = buildPriceLines(pricing);
-
-      const userText = ['✅ *Заявка подтверждена*', ...base, ...price, buildPaymentNote(pricing)].join('\n');
+      const userText = ['✅ *Заявка подтверждена*', ...base, ...price, /*buildPaymentNote(pricing),*/ buildUserExtraText()].join('\n');
       await bot.sendMessage(user.id, userText, { parse_mode: 'Markdown' });
 
       let usernameVal = (user && user.username) || null;
@@ -156,8 +180,7 @@ module.exports = (bot) => ({
         `• *Email:* ${escMd(email || '-')}`
       ];
       const priceLines = buildPriceLines(pricing);
-
-      const textForUser = [...baseLines, ...priceLines, buildPaymentNote(pricing)].join('\n');
+      const textForUser = [...baseLines, ...priceLines, /*buildPaymentNote(pricing),*/buildUserExtraText()].join('\n');
       // await bot.answerWebAppQuery(query_id, {
       //   type: 'article',
       //   id: String(Date.now()),
