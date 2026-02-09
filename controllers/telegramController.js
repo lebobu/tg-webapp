@@ -9,7 +9,7 @@ const { upsertCustomer, appendOrder } = require('../googleSheets');
 const UserExtraText = [
   '💳 *Оплата*',
   'Переводом СБП ',
-  mdBoldCode('79957979609'),
+  mdBoldCode('+79957979609'),
   'или по номеру банковской карты ',
   mdBoldCode('5536090318609271'),
   'Совкомбанк',
@@ -35,7 +35,8 @@ function buildUserExtraText() {
 // }
 
 function mdBoldCode(s = '') {
-  return '*`' + String(s).replace(/`/g, '') + '`*';
+  // return '*`' + String(s).replace(/`/g, '') + '`*';
+  return '*' + String(s).replace(/`/g, '') + '*';
 }
 
 const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || '')
