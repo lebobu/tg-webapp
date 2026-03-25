@@ -9,7 +9,7 @@ const { upsertCustomer, appendOrder } = require('../googleSheets');
 const UserExtraText = [
   '💳 *Оплата*',
   'Переводом СБП ',
-  mdBoldCode('+79957979609'),
+  mdBoldCode('+79777419609'),
   'или по номеру банковской карты ',
   mdBoldCode('5536090318609271'),
   'Совкомбанк',
