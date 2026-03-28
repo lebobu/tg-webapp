@@ -50,7 +50,7 @@ const BRAND = {
   supportEmail: process.env.SUPPORT_EMAIL || ''
 };
 
-function escMd(s = '') { return String(s).replace(/([_*[\]()~`>#+\-=|{}])/g, '\\$1'); }
+function escMd(s = '') { return String(s).replace(/([_*[\]()~`>#+\=|{}])/g, '\\$1'); }
 function isValidEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim()); }
 function buildPriceLines(pricing){ return pricing ? [`• *Итого:* ${escMd(pricing.total)} руб.`] : []; }
 function asUsername(u){ const v=(u||'').toString().trim(); return v?('@'+v.replace(/^@/,'')):'none'; }
