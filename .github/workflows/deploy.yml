@@ -3,7 +3,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main, prod ]
+    branches: [ main, prod, web-only-version ]
   workflow_dispatch:
 
 jobs:
