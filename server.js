@@ -4,6 +4,10 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express     = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const path        = require('path');
+const orderRoute = require('./routes/order');
+
+app.use(express.json());
+app.use('/api', orderRoute);
 
 const { getCustomerByUserId } = require('./googleSheets');
 

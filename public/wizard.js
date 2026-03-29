@@ -337,31 +337,68 @@ document.addEventListener("DOMContentLoaded", () => {
     nextBtn.disabled = true;
     nextBtn.classList.add('is-busy');
 
-    const url = '/webapp-answer';
-    const blob = new Blob([json], { type: 'application/json' });
+  //   const url = '/webapp-answer';
+  //   const blob = new Blob([json], { type: 'application/json' });
 
-    let sent = false;
-    try {
-      if ('sendBeacon' in navigator) {
-        sent = navigator.sendBeacon(url, blob);
-      }
-    } catch {}
+  //   let sent = false;
+  //   try {
+  //     if ('sendBeacon' in navigator) {
+  //       sent = navigator.sendBeacon(url, blob);
+  //     }
+  //   } catch {}
 
-    if (!sent) {
-      try {
-        // fire-and-forget: без await
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: json,
-          keepalive: true
-        }).catch(() => {});
-      } catch {}
-    }
+  //   if (!sent) {
+  //     try {
+  //       // fire-and-forget: без await
+  //       fetch(url, {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: json,
+  //         keepalive: true
+  //       }).catch(() => {});
+  //     } catch {}
+  //   }
 
-    // закрываем почти мгновенно (не ждём сети)
-    setTimeout(() => tg?.close(), 30);
+  //   // закрываем почти мгновенно (не ждём сети)
+  //   setTimeout(() => tg?.close(), 30);
+  // });
+
+// 🚀 ОТПРАВКА В WEB API
+nextBtn.disabled = true;
+nextBtn.classList.add('is-busy');
+
+try {
+  const res = await fetch('/api/order', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      form: {
+        plan: data.plan,
+        accounts: data.accounts,
+        duration: data.duration
+      },
+      pricing,
+      email: data.email
+    })
   });
+
+  const result = await res.json();
+
+  if (result.ok) {
+    alert('Заявка отправлена ✅');
+    window.location.href = '/'; // или /success.html
+  } else {
+    throw new Error('Ошибка ответа сервера');
+  }
+
+} catch (e) {
+  console.error(e);
+  alert('Ошибка отправки ❌');
+  nextBtn.disabled = false;
+  nextBtn.classList.remove('is-busy');
+}
 
   backBtn?.addEventListener("click", (e) => {
     e.preventDefault();
