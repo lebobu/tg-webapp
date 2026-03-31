@@ -6,26 +6,48 @@ const { upsertCustomer, appendOrder } = require('../googleSheets');
 
 // PAYMENT_NOTE можно задать в .env
 //const PAYMENT_NOTE = (process.env.PAYMENT_NOTE || '').trim();
+// const UserExtraText = [
+//   '💳 *Оплата*',
+//   'Переводом СБП ',
+//   mdBoldCode('+79777419609'),
+//   'или по номеру банковской карты ',
+//   mdBoldCode('5536090318609271'),
+//   'Совкомбанк',
+//   'Получатель: Владимир А',
+//   'Проверьте, что вам доходят письма на указанную в заявке эл.почту, а не попадают в спам!',
+//   'Рабочие ссылки для скачивания приложений:',
+//   'Android: https://play.google.com/store/apps/details?id=app.hiddify.com&pcampaignid=web_share',
+//   'iOS: https://apps.apple.com/ru/app/fair-vpn/id1533873488'
+// ].join('\n');
+
+// Вспомогательная функция для экранирования спецсимволов MarkdownV2
+const escsimbsimb = (s = '') => String(s).replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
+
 const UserExtraText = [
-  '💳 *Оплата*',
-  'Переводом СБП ',
-  mdBoldCode('+79777419609'),
-  'или по номеру банковской карты ',
+  '💳 ' + mdBoldCode('Оплата'),
+  escsimb('Переводом СБП '),
+  mdBoldCode('++79777419609'),
+  escsimb('или по номеру банковской карты '),
   mdBoldCode('5536090318609271'),
-  'Совкомбанк',
-  'Получатель: Владимир А',
-  // 'Проверьте, что вам доходят письма на указанную в заявке эл.почту, а не попадают в спам!',
-  // 'Рабочие ссылки для скачивания приложений:',
-  // 'Android: https://play.google.com/store/apps/details?id=app.hiddify.com&pcampaignid=web_share',
-  // 'iOS: https://apps.apple.com/ru/app/fair-vpn/id1533873488'
+  escsimb('Совкомбанк'),
+  escsimb('Получатель: Владимир А'),
+  '', // Пустая строка для красоты
+  escsimb('Проверьте, что письма доходят на почту, а не попадают в спам!'),
+  '',
+  escsimb('Рабочие ссылки для скачивания:'),
+  // Используем формат [Название](ссылка) — это надежнее всего
+  '• [Android \\- Hiddify](https://play.google.com/store/apps/details?id=app.hiddify.com)',
+  '• [iOS \\- Fair VPN](https://apps.apple.com/ru/app/fair-vpn/id1533873488)'
 ].join('\n');
 
-
-
+function mdBoldCode(s = '') {
+  // Экранируем содержимое и оборачиваем в звездочки для жирности
+  return '*' + escsimb(String(s).replace(/`/g, '')) + '*';
+}
 // function buildPaymentNote(pricing) {
 //   const lines = ['', '———', '💳 *Оплата*'];
-//   if (pricing?.total != null) lines.push(`${escMd(pricing.total)} руб.`);
-//   lines.push(escMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail'));
+//   if (pricing?.total != null) lines.push(`${escsimbMd(pricing.total)} руб.`);
+//   lines.push(escsimbMd(PAYMENT_NOTE || 'После подтверждения мы пришлём реквизиты в чат и на e-mail'));
 //   return lines.join('\n');
 // }
 
@@ -38,10 +60,10 @@ function buildUserExtraText() {
 //   return '`' + String(s).replace(/`/g, '') + '`';
 // }
 
-function mdBoldCode(s = '') {
-  // return '*`' + String(s).replace(/`/g, '') + '`*';
-  return '*' + String(s).replace(/`/g, '') + '*';
-}
+// function mdBoldCode(s = '') {
+//   // return '*`' + String(s).replace(/`/g, '') + '`*';
+//   return '*' + String(s).replace(/`/g, '') + '*';
+// }
 
 const ADMIN_IDS = (process.env.ADMIN_CHAT_IDS || process.env.ADMIN_CHAT_ID || '')
   .split(/[,\s]+/).map(x => x.trim()).filter(Boolean);
@@ -54,9 +76,9 @@ const BRAND = {
   supportEmail: process.env.SUPPORT_EMAIL || ''
 };
 
-function escMd(s = '') { return String(s).replace(/([_*[\]()~`>#+\=|{}])/g, '\\$1'); }
+function escsimbMd(s = '') { return String(s).replace(/([_*[\]()~`>#+\=|{}])/g, '\\$1'); }
 function isValidEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim()); }
-function buildPriceLines(pricing){ return pricing ? [`• *Итого:* ${escMd(pricing.total)} руб.`] : []; }
+function buildPriceLines(pricing){ return pricing ? [`• *Итого:* ${escsimbMd(pricing.total)} руб.`] : []; }
 function asUsername(u){ const v=(u||'').toString().trim(); return v?('@'+v.replace(/^@/,'')):'none'; }
 
 async function notifyAdmins(bot, lines){
@@ -120,12 +142,12 @@ module.exports = (bot) => ({
       const emailStr = (email || form?.email || '').trim();
 
       const base = [
-        `• *Тариф:* ${escMd(plan)}`,
-        ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
-        `• *Срок:* ${escMd(duration)} мес.`,
-        `• *Email:* ${escMd(emailStr || '-')}`,
-        `• *Платформа:* ${escMd(platform || 'N/A')}`,
-        `• *User ID:* ${escMd(user.id)}`
+        `• *Тариф:* ${escsimbMd(plan)}`,
+        ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escsimbMd(accounts)}`]),
+        `• *Срок:* ${escsimbMd(duration)} мес.`,
+        `• *Email:* ${escsimbMd(emailStr || '-')}`,
+        `• *Платформа:* ${escsimbMd(platform || 'N/A')}`,
+        `• *User ID:* ${escsimbMd(user.id)}`
       ];
       const price = buildPriceLines(pricing);
       const userText = ['✅ *Заявка подтверждена*', ...base, ...price, /*buildPaymentNote(pricing),*/ buildUserExtraText()].join('\n');
@@ -136,8 +158,8 @@ module.exports = (bot) => ({
 
       await notifyAdmins(bot, [
         ...base, ...price,
-        `• *Username:* ${escMd(asUsername(usernameVal))}`,
-        `• *Chat ID:* ${escMd((await chatStore.get(user.id)) ?? 'none')}`
+        `• *Username:* ${escsimbMd(asUsername(usernameVal))}`,
+        `• *Chat ID:* ${escsimbMd((await chatStore.get(user.id)) ?? 'none')}`
       ]);
 
       // Google Sheets: апдейт покупателя + запись заказа
@@ -178,10 +200,10 @@ module.exports = (bot) => ({
 
       const baseLines = [
         '✅ *Заявка подтверждена!*',
-        `• *Тариф:* ${escMd(plan)}`,
-        ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escMd(accounts)}`]),
-        `• *Срок:* ${escMd(duration)} мес.`,
-        `• *Email:* ${escMd(email || '-')}`
+        `• *Тариф:* ${escsimbMd(plan)}`,
+        ...(SPECIAL_PLANS.has(plan) ? [] : [`• *Аккаунтов:* ${escsimbMd(accounts)}`]),
+        `• *Срок:* ${escsimbMd(duration)} мес.`,
+        `• *Email:* ${escsimbMd(email || '-')}`
       ];
       const priceLines = buildPriceLines(pricing);
       const textForUser = [...baseLines, ...priceLines, /*buildPaymentNote(pricing),*/buildUserExtraText()].join('\n');
@@ -203,7 +225,7 @@ module.exports = (bot) => ({
 
       await notifyAdmins(bot, [
         ...baseLines, ...priceLines,
-        `• *Username:* ${escMd(asUsername(usernameVal))}`,
+        `• *Username:* ${escsimbMd(asUsername(usernameVal))}`,
         `• *User ID:* ${from_id ?? 'none'}`,
         `• *Chat ID:* ${chatId || (from_id && await chatStore.get(from_id)) || 'none'}`
       ]);
