@@ -21,7 +21,7 @@ const { upsertCustomer, appendOrder } = require('../googleSheets');
 // ].join('\n');
 
 // Вспомогательная функция для экранирования спецсимволов MarkdownV2
-const escsimbsimb = (s = '') => String(s).replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
+const escsimb = (s = '') => String(s).replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
 
 const UserExtraText = [
   '💳 ' + mdBoldCode('Оплата'),
