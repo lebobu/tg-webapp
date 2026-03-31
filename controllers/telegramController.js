@@ -26,7 +26,7 @@ const escsimb = (s = '') => String(s).replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&')
 const UserExtraText = [
   '💳 ' + mdBoldCode('Оплата'),
   escsimb('Переводом СБП '),
-  mdBoldCode('++79777419609'),
+  mdBoldCode('+79777419609'),
   escsimb('или по номеру банковской карты '),
   mdBoldCode('5536090318609271'),
   escsimb('Совкомбанк'),
