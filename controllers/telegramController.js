@@ -14,10 +14,10 @@ const UserExtraText = [
   mdBoldCode('5536090318609271'),
   'Совкомбанк',
   'Получатель: Владимир А',
-  'Проверьте, что вам доходят письма на указанную в заявке эл.почту, а не попадают в спам!',
-  'Рабочие ссылки для скачивания приложений:',
-  'Android: https://play.google.com/store/apps/details?id=app.hiddify.com&pcampaignid=web_share',
-  'iOS: https://apps.apple.com/ru/app/fair-vpn/id1533873488'
+  // 'Проверьте, что вам доходят письма на указанную в заявке эл.почту, а не попадают в спам!',
+  // 'Рабочие ссылки для скачивания приложений:',
+  // 'Android: https://play.google.com/store/apps/details?id=app.hiddify.com&pcampaignid=web_share',
+  // 'iOS: https://apps.apple.com/ru/app/fair-vpn/id1533873488'
 ].join('\n');
 
 
