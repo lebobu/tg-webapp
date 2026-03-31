@@ -37,7 +37,9 @@ const UserExtraText = [
   escsimb('Рабочие ссылки для скачивания:'),
   // Используем формат [Название](ссылка) — это надежнее всего
   '• [Android \\- Hiddify](https://play.google.com/store/apps/details?id=app.hiddify.com)',
-  '• [iOS \\- Fair VPN](https://apps.apple.com/ru/app/fair-vpn/id1533873488)'
+  '',
+  '• [iOS \\- Fair VPN](https://apps.apple.com/ru/app/fair-vpn/id1533873488)',
+  ''
 ].join('\n');
 
 function mdBoldCode(s = '') {
