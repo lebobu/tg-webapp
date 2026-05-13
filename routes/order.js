@@ -1,66 +1,80 @@
 const express = require('express');
-      email: emailStr,
-      plan,
-      accounts,
-      duration,
-      pricing
-    };
+const router = express.Router();
 
-    const BRAND = {
-      name:
-        process.env.BRAND_NAME ||
-        'Web Service',
+const { sendMail } = require('../mailer');
+const { buildOrderEmail } = require('../emailTemplates');
+const {
+  upsertCustomer,
+  appendOrder
+} = require('../googleSheets');
 
-      logo:
-        process.env.BRAND_LOGO_URL || '',
+const SPECIAL_PLANS = new Set([
+  'Роутер',
+  'Сервер VPS'
+]);
 
-      primary:
-        process.env.BRAND_PRIMARY || '#0a84ff',
+function isValidEmail(s) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    String(s || '').trim()
+  );
+}
 
-      supportEmail:
-        process.env.SUPPORT_EMAIL || ''
-    };
+router.post('/order', async (req, res) => {
+  try {
+    const {
+      form,
+      pricing,
+      email,
+      customer
+    } = req.body || {};
 
-    const { admin, user } = buildOrderEmail({
-      brand: BRAND,
-      order
-    });
+    const plan = form?.plan ?? '-';
+    const accounts = form?.accounts ?? '-';
+    const duration = form?.duration ?? '-';
 
-    const ADMIN_EMAIL = (
-      process.env.ADMIN_EMAIL || ''
+    const emailStr = (
+      email ||
+      form?.email ||
+      customer?.email ||
+      ''
     ).trim();
 
-    if (ADMIN_EMAIL) {
-      await sendMail({
-        to: ADMIN_EMAIL,
-        subject: admin.subject,
-        text: admin.text,
-        html: admin.html
-      });
-    }
+    const customerName = (
+      customer?.name || ''
+    ).trim();
 
-    if (isValidEmail(emailStr)) {
-      await sendMail({
-        to: emailStr,
-        subject: user.subject,
-        text: user.text,
-        html: user.html
-      });
-    }
+    const phone = (
+      customer?.phone || ''
+    ).trim();
 
-    res.json({
-      ok: true,
-      orderId
+    const orderId = `WEB-${Date.now()}`;
+
+    // =========================
+    // SAVE CUSTOMER
+    // =========================
+    await upsertCustomer({
+      user_id: orderId,
+      username: customerName,
+      email: emailStr
     });
 
-  } catch (e) {
-    console.error('order error:', e);
+    // =========================
+    // SAVE ORDER
+    // =========================
+    await appendOrder({
+      user_id: orderId,
+      username: customerName,
+      email: emailStr,
+      plan,
+      accounts: SPECIAL_PLANS.has(plan)
+        ? '-'
+        : accounts,
+      duration,
+      total: pricing?.total,
+      subscribe: false,
 
-    res.status(500).json({
-      ok: false,
-      error: 'Internal server error'
+      // TELEGRAM FIELDS DISABLED
+      // query_id: '',
+      // chat_id: ''
     });
-  }
-});
-
 module.exports = router;
