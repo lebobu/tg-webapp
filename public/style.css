@@ -1,338 +1,584 @@
-/* style.css */
-body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background-color: #0860b8;
-  color: #fff;
+/* =========================
+   RESET
+========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-h2 {
-  text-align: center;
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  background:
+    linear-gradient(
+      180deg,
+      #0f172a 0%,
+      #111827 100%
+    );
+
+  color: #fff;
+
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  padding:
+    24px
+    16px
+    80px;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.step,
+.confirm-box,
+.modal__dialog {
+  width: 100%;
+  max-width: 720px;
+}
+
+/* =========================
+   TYPOGRAPHY
+========================= */
+
+p,
+li,
+label,
+input,
+button {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+strong {
+  font-weight: 700;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+/* =========================
+   PRICE HEADER
+========================= */
+
+.price-and-cart {
+  width: 100%;
+  max-width: 720px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+}
+
+.price-pill {
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 18px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  font-weight: 700;
+  font-size: 15px;
+
+  backdrop-filter: blur(12px);
+}
+
+.bt-help {
+  width: 48px;
+  height: 48px;
+
+  border: none;
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 20px;
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
+}
+
+.bt-help:hover {
+  background: #1d4ed8;
+}
+
+.bt-help:active {
+  transform: scale(0.96);
+}
+
+/* =========================
+   STEP CARD
+========================= */
+
+.step {
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius: 28px;
+
+  padding:
+    28px
+    22px;
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.35);
+
   margin-bottom: 20px;
 }
+
+.step p {
+  margin-top: 0;
+  margin-bottom: 20px;
+
+  font-size: 18px;
+}
+
+/* =========================
+   BUTTON GROUPS
+========================= */
 
 .buttons {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
+
+  gap: 14px;
+
+  margin-bottom: 18px;
 }
+
+.accounts-label {
+  margin-bottom: 4px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
 
 .btn {
-  padding: 10px 20px;
-  background-color: #0088cc;
+  appearance: none;
+
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 54px;
+
+  padding:
+    14px
+    18px;
+
+  border-radius: 18px;
+
+  background:
+    rgba(255,255,255,0.08);
+
   color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
+
+  font-weight: 600;
+
   text-align: center;
-  transition: background 0.2s;
-  flex: 1;
-  min-width: 100px;
-  text-align: center;
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    border 0.2s ease;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  flex: 1 1 calc(50% - 14px);
+
+  min-width: 140px;
 }
 
-/* .btn:disabled,
-.btn.disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-  pointer-events: none;
-} */
-
 .btn:hover {
-  background-color: #0070a8;
+  background:
+    rgba(255,255,255,0.12);
+}
+
+.btn:active {
+  transform: scale(0.98);
 }
 
 .btn.selected {
-  background-color: #005f90;
-  box-shadow: 0 0 0 2px #00446c inset;
+  background: #2563eb;
+  border-color: #3b82f6;
 }
 
 .btn.full {
-  width: auto;
-  max-width: none;
+  width: 100%;
 }
 
-#back::before {
-  content: "<<< ";
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-#next::after {
-  content: " >>>";
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.nav-buttons {
+  width: 100%;
+  max-width: 720px;
+
+  margin-top: 8px;
 }
+
+#back {
+  flex: 0 0 120px;
+}
+
+#next {
+  flex: 1;
+}
+
+/* =========================
+   SUMMARY
+========================= */
+
+.confirm-box {
+  background:
+    rgba(255,255,255,0.04);
+
+  border-radius: 22px;
+
+  padding: 18px;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+}
+
+#summary p {
+  margin:
+    10px
+    0;
+}
+
+#summary hr {
+  border: none;
+  border-top:
+    1px solid rgba(255,255,255,0.1);
+
+  margin:
+    18px
+    0;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.field {
+  margin-top: 18px;
+}
+
+.email-label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.email {
+  width: 100%;
+
+  height: 56px;
+
+  border-radius: 16px;
+
+  border:
+    1px solid rgba(255,255,255,0.1);
+
+  background:
+    rgba(255,255,255,0.08);
+
+  color: white;
+
+  padding:
+    0 16px;
+
+  font-size: 16px;
+
+  outline: none;
+
+  transition:
+    border 0.2s ease,
+    background 0.2s ease;
+}
+
+.email:focus {
+  border-color: #3b82f6;
+  background:
+    rgba(255,255,255,0.12);
+}
+
+.email::placeholder {
+  color:
+    rgba(255,255,255,0.45);
+}
+
+/* =========================
+   PROGRESS BAR
+========================= */
 
 .progress {
   width: 100%;
-  height: 12px;
-  background-color: #ddd;
-  border-radius: 4px;
+  max-width: 720px;
+
+  height: 10px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.08);
+
   overflow: hidden;
-  margin: 20px 0;
+
+  margin:
+    8px 0 18px;
 }
 
 .progress-bar {
   height: 100%;
-  background-color: #0088cc;
-  width: 0%;
-  transition: width 0.3s ease-in-out;
+
+  width: 33%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #60a5fa
+    );
+
+  transition:
+    width 0.25s ease;
 }
 
-.nav-buttons {
-  justify-content: space-between;
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(0,0,0,0.7);
+
+  z-index: 999;
 }
 
-@media (max-width: 480px) {
+.modal.active {
+  display: flex;
+}
+
+.modal__dialog {
+  background:
+    #111827;
+
+  border-radius: 28px;
+
+  padding:
+    26px
+    22px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  position: relative;
+}
+
+.modal__close {
+  position: absolute;
+
+  top: 16px;
+  right: 16px;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 22px;
+}
+
+/* =========================
+   ACCORDION
+========================= */
+
+.acc-item {
+  border-bottom:
+    1px solid rgba(255,255,255,0.08);
+
+  padding:
+    12px
+    0;
+}
+
+.acc-item summary {
+  cursor: pointer;
+
+  list-style: none;
+
+  font-weight: 600;
+
+  padding-right: 24px;
+}
+
+.acc-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.acc-body {
+  padding-top: 14px;
+}
+
+.acc-body p,
+.acc-body li {
+  color:
+    rgba(255,255,255,0.86);
+}
+
+.acc-body a {
+  color: #60a5fa;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+a {
+  color: #60a5fa;
+}
+
+a:hover {
+  opacity: 0.9;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 640px) {
+
+  body {
+    padding:
+      18px
+      12px
+      100px;
+  }
+
+  .step {
+    padding:
+      22px
+      16px;
+  }
+
+  .btn {
+    flex: 1 1 100%;
+    min-width: unset;
+  }
+
   .nav-buttons {
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: nowrap;
+  }
+
+  .price-pill {
+    font-size: 14px;
+  }
+
+  .step p {
+    font-size: 17px;
   }
 }
 
-/* общий контейнер шага подтверждения — центрируем и ограничиваем ширину */
-.confirm-box {
-  max-width: 560px;
-  /* подгоните под ваш вкус */
-  margin: 0 auto;
-  /* центр */
-  width: 100%;
-  box-sizing: border-box;
+/* =========================
+   DESKTOP ENHANCEMENTS
+========================= */
+
+@media (min-width: 1024px) {
+
+  body {
+    padding-top: 48px;
+  }
+
+  .step {
+    padding:
+      36px
+      32px;
+  }
+
+  .btn {
+    min-height: 58px;
+    font-size: 16px;
+  }
+
+  .modal__dialog {
+    padding:
+      36px
+      32px;
+  }
 }
-
-#summary {
-  padding: 10px 10px;
-  background-color: #0088cc;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: bold;
-  text-align: center;
-  transition: background 0.2s;
-  flex: 1;
-  min-width: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.price-and-cart {
-  display: flex;
-  align-items: center;
-  /* justify-content:space-between; 1-й влево, 2-й вправо */
-  gap: 12px;
-  /* margin:5px 0; */
-}
-
-.price-pill {
-  display: none;
-  /* margin: 12px 0 0; */
-  padding: 5px 10px;
-  border-radius: 12px;
-  background: #0088cc;
-}
-
-.price-pill.show {
-  display: inline-block;
-}
-
-.price-pill small {
-  font-weight: 500;
-  opacity: .7;
-  margin-left: 6px;
-}
-
-.bt-help {
-  border: 0;
-  background: transparent;
-  appearance: none;
-  -webkit-appearance: none;
-  margin-left: auto;
-  font-size: 1.8rem;
-  text-align: right;
-  margin-bottom: 10px;
-}
-
-/* input e-mail — на всю ширину контейнера */
-.email {
-  font-size: 18px;      /* размер текста в инпуте */
-  line-height: 1.3;     /* чтобы текст не «жался» */
-  padding: 12px 14px;   /* при желании увеличить высоту поля */
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-}
-
-#email-field {
-  /* можно добавить легкий фон/рамку, если нужно визуально совпасть */
-  background: #0088cc;
-  border-radius: 8px;
-  padding: 10px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* базовые утилиты */
-.no-scroll { overflow: hidden; }
-
-/* модалка */
-.modal{
-  position: fixed; inset: 0;
-  display: none;            /* скрыто по умолчанию */
-  background: rgba(0,0,0,.38);
-  z-index: 1000;
-}
-.modal--open{ display: block; }
-
-.modal__dialog{
-  position: relative;
-  margin: 6vh auto 4vh;
-  max-width: 640px;
-  width: calc(100% - 32px);
-
-  /* КЛЮЧЕВЫЕ СТРОКИ: */
-  max-height: 84vh;              /* чтобы «вписываться» в экран */
-  overflow: auto;                 /* прокрутка внутри модалки */
-  -webkit-overflow-scrolling: touch; /* плавный скролл на iOS */
-
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.2);
-  padding: 16px 16px 18px;
-  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: crimson;
-}
-
-/* при очень низких экранах можно ужать вертикальные отступы */
-@media (max-height: 580px){
-  .modal__dialog{ margin: 4vh auto; max-height: 90vh; }
-}
-
-/* чтобы шапка/кнопка закрытия не уезжали при прокрутке — опц. «стикнуть» заголовок */
-.modal__title{
-  position: sticky; top: 0;
-  background: #fff; padding-top: 2px;
-  z-index: 1;
-}
-
-.modal__bottom{
-  color: rgb(22, 194, 179);
-}
-
-.modal__content{
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: inherit;   /* подхватит ограничение от .modal__dialog */
-  color: #111;
-}
-
-.modal__content hr{
-  border: 0; height: 1px; background: #194f96; margin: 12px 0;
-}
-
-.modal__close{
-  position: absolute; top: 8px; right: 10px;
-  border: 0; background: transparent; cursor: pointer;
-  font-size: 24px; line-height: 1;
-}
-.modal__close:focus { outline: none; }
-.modal__close:focus-visible { outline: 2px solid #f0f3f6; outline-offset: 2px; }
-
-/* Accordion (spoilers) */
-.accordion { margin: 0; padding: 0; }
-
-.acc-item{
-  border: 1px solid #e6e8eb;
-  border-radius: 12px;
-  background: #fff;
-  margin: 8px 0;
-  overflow: hidden;
-  color: brown;
-}
-
-/* убираем дефолтный маркер summary */
-.acc-item summary::-webkit-details-marker { display: none; }
-
-.acc-item summary{
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 12px 14px;
-  font: 600 14px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  user-select: none;
-  outline: none;
-}
-
-.acc-item summary:focus-visible{
-  outline: 2px solid #0a84ff;
-  outline-offset: 2px;
-  border-radius: 10px;
-}
-
-/* своя стрелка */
-.acc-item summary::before{
-  content: "▸";
-  font-size: 24px;        /* ← больше размер стрелки */
-  line-height: 1; 
-  display: inline-block;
-  margin-right: 8px;
-  transform: translateY(-1px);
-  transition: transform .2s ease;
-  color: #6b7280;
-}
-
-.acc-item[open] summary::before{
-  transform: rotate(90deg) translateY(-1px);
-}
-
-/* содержимое */
-.acc-body{
-  padding: 10px 14px 12px;
-  border-top: 1px solid #eef1f4;
-  color: #111;
-}
-.acc-body p{ margin: 8px 0; }
-.acc-body ol{ margin: 6px 0 0 18px; }
-
-/* Таблица цен в окне Помощь */
-
-/* контейнер со скроллом, если колонок много */
-.pt-wrap { overflow: auto; }
-
-/* заголовки блоков (название плана) */
-.pt-title{
-  margin: 12px 0 6px;
-  font: 600 14px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color:rgb(3, 99, 67);
-  font-weight: 700;
-}
-
-/* таблица цен */
-.price-table{
-  width: 100%;
-  border-collapse: collapse;
-  font: 13px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: #fff;
-  border: 1px solid #e6e8eb;
-  border-radius: 10px;        /* для iOS/Safari скругление не всегда видно без обёртки */
-  overflow: hidden;
-}
-.price-table thead th{
-  background: #f7f8fa;
-  font-weight: 700;
-  text-align: center;
-}
-.price-table th,
-.price-table td{
-  padding: 8px 10px;
-  border: 1px solid #e6e8eb;
-  text-align: center;
-  white-space: nowrap;
-}
-.price-table th:first-child{
-  text-align: left;           /* левая колонка — "Аккаунты" */
-  white-space: nowrap;
-}
-
-
