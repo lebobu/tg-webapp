@@ -1,47 +1,65 @@
 const express = require('express');
-const router = express.Router();
-
-const { upsertCustomer, appendOrder } = require('../googleSheets');
-
-const SPECIAL_PLANS = new Set(['Роутер', 'Сервер VPS']);
-
-router.post('/order', async (req, res) => {
-  try {
-    const { form, pricing, email } = req.body || {};
-
-    const plan     = form?.plan ?? '-';
-    const accounts = form?.accounts ?? '-';
-    const duration = form?.duration ?? '-';
-    const emailStr = (email || form?.email || '').trim();
-
-    // можно генерить user_id как timestamp или uuid
-    const user_id = Date.now().toString();
-
-    // запись в таблицу
-    await upsertCustomer({
-      user_id,
-      username: '',
-      email: emailStr
-    });
-
-    await appendOrder({
-      user_id,
-      username: '',
       email: emailStr,
       plan,
-      accounts: SPECIAL_PLANS.has(plan) ? '-' : accounts,
+      accounts,
       duration,
-      total: pricing?.total,
-      subscribe: false,
-      query_id: '',
-      chat_id: ''
+      pricing
+    };
+
+    const BRAND = {
+      name:
+        process.env.BRAND_NAME ||
+        'Web Service',
+
+      logo:
+        process.env.BRAND_LOGO_URL || '',
+
+      primary:
+        process.env.BRAND_PRIMARY || '#0a84ff',
+
+      supportEmail:
+        process.env.SUPPORT_EMAIL || ''
+    };
+
+    const { admin, user } = buildOrderEmail({
+      brand: BRAND,
+      order
     });
 
-    res.json({ ok: true });
+    const ADMIN_EMAIL = (
+      process.env.ADMIN_EMAIL || ''
+    ).trim();
+
+    if (ADMIN_EMAIL) {
+      await sendMail({
+        to: ADMIN_EMAIL,
+        subject: admin.subject,
+        text: admin.text,
+        html: admin.html
+      });
+    }
+
+    if (isValidEmail(emailStr)) {
+      await sendMail({
+        to: emailStr,
+        subject: user.subject,
+        text: user.text,
+        html: user.html
+      });
+    }
+
+    res.json({
+      ok: true,
+      orderId
+    });
 
   } catch (e) {
     console.error('order error:', e);
-    res.status(500).json({ ok: false });
+
+    res.status(500).json({
+      ok: false,
+      error: 'Internal server error'
+    });
   }
 });
 

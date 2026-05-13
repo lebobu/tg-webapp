@@ -1,61 +1,54 @@
-// server.js v.2.10-2026
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+// server.js
+require('dotenv').config({
+  path: require('path').join(__dirname, '.env')
+});
 
-const express     = require('express');
-const TelegramBot = require('node-telegram-bot-api');
-const path        = require('path');
+const express = require('express');
+const path = require('path');
+
 const orderRoute = require('./routes/order');
 
-app.use(express.json());
-app.use('/api', orderRoute);
-
-const { getCustomerByUserId } = require('./googleSheets');
-
-const BOT_TOKEN  = process.env.BOT_TOKEN;
-const SERVER_URL = process.env.SERVER_URL;
-const PORT       = process.env.PORT || 3000;
-
-if (!BOT_TOKEN)  throw new Error('BOT_TOKEN is not set');
-if (!SERVER_URL) throw new Error('SERVER_URL is not set');
-
-const bot = new TelegramBot(BOT_TOKEN);
-bot.setWebHook(`${SERVER_URL}/telegram-webhook`);
-
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+// =========================
+// MIDDLEWARE
+// =========================
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// STATIC
 app.use(express.static(path.join(__dirname, 'public')));
 
-const telegramController = require('./controllers/telegramController')(bot);
+// API
+app.use('/api', orderRoute);
 
-// подписки бота
-bot.onText(/\/start(?:\s|$)/, telegramController.onStartCommand);
-bot.onText(/\/id(?:\s|$)/, telegramController.onIdCommand);
-bot.on('message', telegramController.onAnyMessage); // обновляем маппинг user→chat
+// HEALTHCHECK
+app.get('/health', (_, res) => {
+  res.json({ ok: true, mode: 'web-only' });
+});
 
-// вебхуки и эндпоинты
-app.post('/telegram-webhook', telegramController.onWebhook);
-app.post('/data', telegramController.onWebAppData);       // опционально
-app.post('/webapp-answer', telegramController.onWebAppAnswer); // inline → answerWebAppQuery
+// =========================
+// TELEGRAM CODE DISABLED
+// =========================
 
-app.get('/health', (_, res) => res.json({ ok: true }));
+// const TelegramBot = require('node-telegram-bot-api');
+// const BOT_TOKEN  = process.env.BOT_TOKEN;
+// const SERVER_URL = process.env.SERVER_URL;
+// const bot = new TelegramBot(BOT_TOKEN);
+// bot.setWebHook(`${SERVER_URL}/telegram-webhook`);
+// const telegramController = require('./controllers/telegramController')(bot);
+// bot.onText(/\/start(?:\s|$)/, telegramController.onStartCommand);
+// bot.onText(/\/id(?:\s|$)/, telegramController.onIdCommand);
+// bot.on('message', telegramController.onAnyMessage);
+// app.post('/telegram-webhook', telegramController.onWebhook);
+// app.post('/data', telegramController.onWebAppData);
+// app.post('/webapp-answer', telegramController.onWebAppAnswer);
+// app.post('/prefill-email', telegramController.prefillEmail);
 
+// =========================
+// START
+// =========================
 app.listen(PORT, () => {
-  console.log(`🚀 Server listening on port ${PORT}`);
+  console.log(`🚀 Web server started on port ${PORT}`);
 });
-
-// префилл e-mail для WebApp
-app.post('/prefill-email', async (req, res) => {
-  try {
-    const { user_id } = req.body || {};
-    if (!user_id) return res.json({ ok: true, email: null });
-
-    const c = await getCustomerByUserId(user_id);
-    const email = c?.email || null;
-    res.json({ ok: true, email });
-  } catch (e) {
-    console.error('prefill-email error', e);
-    res.json({ ok: false, email: null });
-  }
-});
-
