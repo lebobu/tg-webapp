@@ -53,7 +53,55 @@ function init() {
     onBack
   );
 
+  bindHelpModal();
+
   render();
+}
+
+// =========================
+// HELP MODAL
+// =========================
+
+function bindHelpModal() {
+
+  const modal =
+    document.getElementById('help-modal');
+
+  const openBtn =
+    document.querySelector('.bt-help');
+
+  // открыть
+  openBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+  });
+
+  // закрыть по кнопке ×
+  modal.addEventListener('click', e => {
+
+    if (
+      e.target.closest('[data-close]') ||
+      e.target === modal
+    ) {
+      closeHelpModal(modal);
+    }
+  });
+
+  // закрыть по Escape
+  document.addEventListener('keydown', e => {
+
+    if (
+      e.key === 'Escape' &&
+      modal.classList.contains('active')
+    ) {
+      closeHelpModal(modal);
+    }
+  });
+}
+
+function closeHelpModal(modal) {
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
 }
 
 // =========================

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { sendMail } = require('../mailer');
 const { buildOrderEmail } = require('../emailTemplates');
+const { appendOrder, upsertCustomer } = require('../googleSheets');
 
 router.post('/order', async (req, res) => {
   try {
@@ -28,6 +29,32 @@ router.post('/order', async (req, res) => {
 
       pricing
     };
+
+    // =========================
+    // GOOGLE SHEETS
+    // =========================
+
+    try {
+      // Записываем/обновляем клиента
+      await upsertCustomer({
+        user_id: orderId,
+        username: order.name || '',
+        email: order.email
+      });
+
+      // Записываем заказ
+      await appendOrder({
+        email: order.email,
+        plan: order.plan,
+        accounts: order.accounts,
+        duration: order.duration,
+        total: pricing.total,
+        subscribe: false
+      });
+    } catch (sheetsErr) {
+      // Не прерываем заказ если Sheets недоступны
+      console.warn('Google Sheets write failed:', sheetsErr.message);
+    }
 
     const BRAND = {
       name:
