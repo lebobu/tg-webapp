@@ -252,7 +252,7 @@ function showReceipt(orderId) {
 
     <div style="background:rgba(255,255,255,0.06);border-radius:16px;padding:16px;border:1px solid rgba(255,255,255,0.1)">
       <p style="margin:0 0 10px;font-weight:600">💳 Способы оплаты</p>
-      <p style="margin:6px 0">📲 <strong>СБП</strong> по номеру: <strong>+7 995 797-96-09</strong></p>
+      <p style="margin:6px 0">📲 <strong>СБП</strong> по номеру: <strong>+7 977 741-96-09</strong></p>
       <p style="margin:6px 0">💳 <strong>Карта:</strong> 5536 0903 1860 9271</p>
       <p style="margin:6px 0;color:rgba(255,255,255,0.5);font-size:14px">Совкомбанк · Владимир А.</p>
     </div>
