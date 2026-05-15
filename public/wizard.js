@@ -233,8 +233,8 @@ function showReceipt(orderId) {
   document.getElementById('receipt-box').innerHTML = `
 
     <div style="text-align:center;padding:20px 0 12px">
-      <div style="font-size:52px;line-height:1">✅</div>
-      <h2 style="margin:12px 0 4px;font-size:22px">Заказ оформлен!</h2>
+      <div style="font-size:36px;line-height:1">✅</div>
+      <h3 style="margin:12px 0 4px;font-size:22px">Заказ оформлен!</h3>
       <p style="color:rgba(255,255,255,0.5);font-size:14px;margin:0">№ ${orderId}</p>
     </div>
 
