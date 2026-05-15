@@ -48,12 +48,12 @@
 
   <!-- Шаг 3 -->
 <div class="step step-3" style="display:none">
-  <p><strong>Шаг 3/3: Подтверждение</strong></p>
+  <p><strong>Шаг 3/4: Подтверждение</strong></p>
 
   <div class="confirm-box">
     <div id="summary"></div>
 
-    <!-- Шаг 3: Email (после summary) -->
+    <!-- Email -->
     <div class="field" id="email-field" style="margin-top:12px">
       <label for="email" class="email-label" style="display:block; font-weight:600; margin-bottom:6px;">
         Заполните (проверьте) ваш адрес эл.почты
@@ -62,6 +62,24 @@
              placeholder="you@example.com" required>
       <small id="email-error" style="display:none; color:#f3fc03; margin-top:6px;">Введите корректный email</small>
     </div>
+
+    <!-- ОС устройства -->
+    <div class="field" id="os-field" style="margin-top:18px">
+      <label style="display:block; font-weight:600; margin-bottom:10px;">Ваша операционная система</label>
+      <div class="buttons" style="margin-bottom:0">
+        <button type="button" class="btn os-btn" data-os="apple">🍎 Apple (iOS / macOS)</button>
+        <button type="button" class="btn os-btn" data-os="android">🤖 Android</button>
+        <button type="button" class="btn os-btn" data-os="windows">🪟 Windows</button>
+      </div>
+      <small id="os-error" style="display:none; color:#f3fc03; margin-top:6px;">Выберите операционную систему</small>
+    </div>
+  </div>
+</div>
+
+  <!-- Шаг 4 -->
+<div class="step step-4" style="display:none">
+  <div class="confirm-box" id="receipt-box">
+    <!-- заполняется из wizard.js -->
   </div>
 </div>
 
@@ -74,6 +92,7 @@
   <div class="buttons nav-buttons">
     <a href="#" class="btn" id="back">Назад</a>
     <a href="#" class="btn full" id="next">Далее</a>
+    <a href="/" class="btn full" id="ok-btn" style="display:none;background:#2563eb;border-color:#3b82f6">OK</a>
   </div>
 
   <!-- 🔧 Ручная матрица ИТОГОВЫХ цен -->

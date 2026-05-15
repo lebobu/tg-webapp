@@ -19,11 +19,37 @@ function getClient() {
 }
 
 // --- Customers ---
+
+/**
+ * Ищет клиента по email (колонка C, индекс 2).
+ * Возвращает { rowIndex, row } или null.
+ */
+async function findCustomerByEmail(sheets, email) {
+  if (!email) return null;
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: 'Customers!A2:F',  // user_id, username, email, first_seen, last_seen, order_count
+  });
+  const rows = data.values || [];
+  const emailLower = email.toLowerCase();
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if ((row[2] || '').toLowerCase() === emailLower) {
+      return { rowIndex: i, row };
+    }
+  }
+  return null;
+}
+
+/**
+ * Ищет клиента по user_id (колонка A).
+ */
 async function getCustomerByUserId(userId) {
   if (!SHEET_ID) return null;
   const sheets = getClient();
   const { data } = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID, range: 'Customers!A2:C', // user_id, username, email
+    spreadsheetId: SHEET_ID,
+    range: 'Customers!A2:C',
   });
   const rows = data.values || [];
   const idStr = String(userId);
@@ -34,43 +60,52 @@ async function getCustomerByUserId(userId) {
   return null;
 }
 
+/**
+ * Ищет клиента по email — публичный метод для роутов.
+ */
+async function getCustomerByEmail(email) {
+  if (!SHEET_ID || !email) return null;
+  const sheets = getClient();
+  const found = await findCustomerByEmail(sheets, email);
+  if (!found) return null;
+  const [uid, username, em, first_seen, last_seen, order_count] = found.row;
+  return { user_id: uid, username, email: em, first_seen, last_seen, order_count };
+}
+
+/**
+ * Upsert клиента:
+ * - Если email найден → обновляем username/last_seen, увеличиваем order_count.
+ * - Если не найден → добавляем новую строку.
+ */
 async function upsertCustomer({ user_id, username, email }) {
   if (!SHEET_ID) return;
   const sheets = getClient();
-  // читаем все, ищем строку
-  const { data } = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID, range: 'Customers!A2:F',
-  });
-  const rows = data.values || [];
   const now = new Date().toISOString();
-  const idStr = String(user_id);
-  let foundIndex = -1;
-  rows.forEach((r, i) => { if (String(r[0]) === idStr) foundIndex = i; });
 
-  if (foundIndex >= 0) {
-    // update: email/username/last_seen/order_count+1
-    const r = rows[foundIndex];
+  const found = await findCustomerByEmail(sheets, email);
+
+  if (found) {
+    // Клиент существует — обновляем
+    const r = found.row;
     const orderCount = Number(r[5] || 0) + 1;
     const values = [
-      idStr,
+      r[0] || String(user_id),   // user_id — оставляем оригинальный
       username || r[1] || '',
-      email    || r[2] || '',
-      r[3] || now,     // first_seen
-      now,             // last_seen
+      email,
+      r[3] || now,               // first_seen
+      now,                       // last_seen
       orderCount
     ];
-    const startRow = 2 + foundIndex; // A2 -> index 0
+    const sheetRow = 2 + found.rowIndex;
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: `Customers!A${startRow}:F${startRow}`,
+      range: `Customers!A${sheetRow}:F${sheetRow}`,
       valueInputOption: 'RAW',
       requestBody: { values: [values] }
     });
   } else {
-    // insert new
-    const values = [
-      idStr, username || '', email || '', now, now, 1
-    ];
+    // Новый клиент — вставляем
+    const values = [String(user_id), username || '', email || '', now, now, 1];
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
       range: 'Customers!A:F',
@@ -82,11 +117,12 @@ async function upsertCustomer({ user_id, username, email }) {
 }
 
 // --- Orders ---
+
 async function appendOrder(order) {
   if (!SHEET_ID) return;
   const sheets = getClient();
   const {
-    user_id, username, email, plan, accounts, duration, total, subscribe, query_id, chat_id
+    user_id, username, email, plan, accounts, duration, os, total, subscribe, query_id, chat_id
   } = order;
   const values = [[
     new Date().toISOString(),
@@ -96,6 +132,7 @@ async function appendOrder(order) {
     String(plan || ''),
     String(accounts ?? '-'),
     String(duration ?? ''),
+    String(os || '-'),
     String(total ?? ''),
     subscribe ? 'yes' : 'no',
     String(query_id || ''),
@@ -103,7 +140,7 @@ async function appendOrder(order) {
   ]];
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
-    range: 'Orders!A:K',
+    range: 'Orders!A:L',        // теперь 12 колонок (добавилась os)
     valueInputOption: 'RAW',
     insertDataOption: 'INSERT_ROWS',
     requestBody: { values }
@@ -112,6 +149,7 @@ async function appendOrder(order) {
 
 module.exports = {
   getCustomerByUserId,
+  getCustomerByEmail,
   upsertCustomer,
   appendOrder,
 };

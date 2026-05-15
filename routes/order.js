@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { sendMail } = require('../mailer');
 const { buildOrderEmail } = require('../emailTemplates');
-const { appendOrder, upsertCustomer } = require('../googleSheets');
+const { appendOrder, upsertCustomer, getCustomerByEmail } = require('../googleSheets');
 
 router.post('/order', async (req, res) => {
   try {
@@ -22,6 +22,7 @@ router.post('/order', async (req, res) => {
       plan: form.plan || '-',
       duration: form.duration || '-',
       accounts: form.accounts || '-',
+      os: form.os || '-',
 
       email: email || customer.email || '',
       name: customer.name || '',
@@ -35,56 +36,42 @@ router.post('/order', async (req, res) => {
     // =========================
 
     try {
-      // Записываем/обновляем клиента
+      // Проверяем существование клиента по email
+      // upsertCustomer сам найдёт запись и увеличит order_count
       await upsertCustomer({
-        user_id: orderId,
+        user_id: orderId,   // для новых клиентов — orderId как id
         username: order.name || '',
         email: order.email
       });
 
-      // Записываем заказ
+      // Записываем заказ в лист Orders
       await appendOrder({
         email: order.email,
         plan: order.plan,
         accounts: order.accounts,
         duration: order.duration,
+        os: order.os,
         total: pricing.total,
         subscribe: false
       });
     } catch (sheetsErr) {
-      // Не прерываем заказ если Sheets недоступны
       console.warn('Google Sheets write failed:', sheetsErr.message);
     }
 
     const BRAND = {
-      name:
-        process.env.BRAND_NAME ||
-        'Web Service',
-
-      logo:
-        process.env.BRAND_LOGO_URL || '',
-
-      primary:
-        process.env.BRAND_PRIMARY ||
-        '#0a84ff',
-
-      supportEmail:
-        process.env.SUPPORT_EMAIL || ''
+      name:         process.env.BRAND_NAME || 'Web Service',
+      logo:         process.env.BRAND_LOGO_URL || '',
+      primary:      process.env.BRAND_PRIMARY || '#0a84ff',
+      supportEmail: process.env.SUPPORT_EMAIL || ''
     };
 
-    const { admin, user } =
-      buildOrderEmail({
-        brand: BRAND,
-        order
-      });
+    const { admin, user } = buildOrderEmail({ brand: BRAND, order });
 
     // =========================
     // ADMIN EMAIL
     // =========================
 
-    const ADMIN_EMAIL =
-      process.env.ADMIN_EMAIL;
-
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
     if (ADMIN_EMAIL) {
       await sendMail({
         to: ADMIN_EMAIL,
@@ -107,22 +94,11 @@ router.post('/order', async (req, res) => {
       });
     }
 
-    res.json({
-      ok: true,
-      orderId
-    });
+    res.json({ ok: true, orderId });
 
   } catch (err) {
-
-    console.error(
-      'ORDER ERROR:',
-      err
-    );
-
-    res.status(500).json({
-      ok: false,
-      error: 'Internal server error'
-    });
+    console.error('ORDER ERROR:', err);
+    res.status(500).json({ ok: false, error: 'Internal server error' });
   }
 });
 
