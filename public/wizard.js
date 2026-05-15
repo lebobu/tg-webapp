@@ -258,9 +258,8 @@ function showReceipt(orderId) {
     </div>
 
     <p style="margin-top:16px;color:rgba(255,255,255,0.7);font-size:14px;line-height:1.5">
-      После оплаты отправьте скриншот или чек в
-      <a href="https://t.me/polpo2022" target="_blank" rel="noopener">чат поддержки</a> —
-      ключ доступа будет выдан в течение нескольких минут.
+      Ключ доступа будет выдан в течение 2-х часов. Ожидаем оплату в ближайшие сутки, спасибо за заказ</br>
+      <a href="https://t.me/polpo2022" target="_blank" rel="noopener">чат поддержки в Телеграм</a>
     </p>
   `;
 }
