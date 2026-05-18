@@ -129,6 +129,31 @@ a {
   margin-bottom: var(--space-4);
 }
 
+.choice-card {
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.choice-card:last-of-type {
+  margin-bottom: 0;
+}
+
+.choice-card__title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 10px;
+}
+
+.choice-card .buttons {
+  margin-bottom: 0;
+}
+
 .accounts-label,
 .buttons > span {
   width: 100%;
@@ -333,6 +358,10 @@ summary:focus-visible {
   .btn {
     flex: 1 1 calc(50% - 12px);
     min-width: 170px;
+  }
+
+  .choice-card {
+    padding: var(--space-5);
   }
 
   .nav-buttons {

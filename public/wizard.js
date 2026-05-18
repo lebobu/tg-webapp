@@ -1,9 +1,10 @@
-// =========================
+﻿// =========================
 // WEB WIZARD
 // =========================
 
 const state = {
   plan: null,
+  planBeforeRouter: null,
   accounts: null,
   duration: null,
   email: '',
@@ -49,6 +50,7 @@ const okBtn    = document.getElementById('ok-btn');
 const progressBar = document.getElementById('progress-bar');
 const summary  = document.getElementById('summary');
 const emailInput = document.getElementById('email');
+const osField = document.getElementById('os-field');
 
 // =========================
 // INIT
@@ -82,15 +84,21 @@ function bindOptions() {
     btn.addEventListener('click', () => {
       const { plan, accounts, duration } = btn.dataset;
       if (plan) {
-        state.plan = plan;
         if (plan === 'Роутер') {
+          if (state.plan && state.plan !== 'Роутер') {
+            state.planBeforeRouter = state.plan;
+          }
+          state.plan = plan;
           state.accounts = null;
+        } else {
+          state.plan = plan;
+          state.planBeforeRouter = plan;
         }
       }
       if (accounts) {
         state.accounts = accounts;
         if (state.plan === 'Роутер') {
-          state.plan = null;
+          state.plan = state.planBeforeRouter || 'EU';
         }
       }
       if (duration) state.duration = duration;
@@ -129,6 +137,18 @@ function bindOsButtons() {
   });
 }
 
+function updateOsVisibility() {
+  if (!osField) return;
+  const isRouter = state.plan === 'Роутер';
+  osField.style.display = isRouter ? 'none' : 'block';
+  if (isRouter) {
+    state.os = null;
+    document.querySelectorAll('.os-btn').forEach(b => b.classList.remove('selected'));
+    const osError = document.getElementById('os-error');
+    if (osError) osError.style.display = 'none';
+  }
+}
+
 // =========================
 // NAVIGATION
 // =========================
@@ -159,11 +179,13 @@ function onNext() {
       emailError.style.display = 'none';
     }
 
-    if (!state.os) {
-      osError.style.display = 'block';
-      valid = false;
-    } else {
-      osError.style.display = 'none';
+    if (state.plan !== 'Роутер') {
+      if (!state.os) {
+        osError.style.display = 'block';
+        valid = false;
+      } else {
+        osError.style.display = 'none';
+      }
     }
 
     if (!valid) return;
@@ -211,6 +233,10 @@ function render() {
   } else {
     nextBtn.classList.remove('single-next');
   }
+
+  if (currentStep === 3) {
+    updateOsVisibility();
+  }
 }
 
 // =========================
@@ -224,14 +250,17 @@ function updateSummary() {
     <p><strong>Аккаунты:</strong> ${state.accounts || '-'}</p>
     <p><strong>Срок:</strong> ${state.duration} мес.</p>
     <hr>
-    <p><strong>Итого: ${total} ₽</strong></p>
+    <p><strong>Итого: ${total == null ? '—' : `${total} ₽`}</strong></p>
   `;
 }
 
 function getPrice() {
   const pricing = window.PRICING.matrixTotals;
-  if (state.plan === 'Роутер') return pricing['Роутер'].durations[state.duration];
-  return pricing[state.plan][state.accounts][state.duration];
+  if (!state.plan || !state.duration) return null;
+  if (state.plan === 'Роутер') {
+    return pricing['Роутер']?.durations?.[state.duration] ?? null;
+  }
+  return pricing[state.plan]?.[state.accounts]?.[state.duration] ?? null;
 }
 
 // =========================
@@ -364,3 +393,5 @@ function closeHelpModal(modal) {
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+
