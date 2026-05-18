@@ -92,6 +92,7 @@ a {
 .bt-help {
   width: 48px;
   height: 48px;
+  margin-left: auto;
   border: 1px solid rgba(125, 211, 252, 0.26);
   border-radius: 14px;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
