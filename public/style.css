@@ -1,10 +1,28 @@
-/* =========================
-   RESET
-========================= */
+﻿:root {
+  --bg-0: #0b1220;
+  --bg-1: #111c2f;
+  --surface: rgba(255, 255, 255, 0.08);
+  --surface-strong: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.14);
+  --text-main: #f8fafc;
+  --text-soft: rgba(248, 250, 252, 0.82);
+  --text-hint: rgba(248, 250, 252, 0.62);
+  --accent: #22d3ee;
+  --accent-2: #3b82f6;
+  --danger: #f87171;
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --shadow-1: 0 14px 36px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 8px 20px rgba(34, 211, 238, 0.18);
+}
 
-*,
-*::before,
-*::after {
+* , *::before, *::after {
   box-sizing: border-box;
 }
 
@@ -14,239 +32,149 @@ html {
 
 body {
   margin: 0;
-  padding: 0;
-
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
-  background:
-    linear-gradient(
-      180deg,
-      #0f172a 0%,
-      #111827 100%
-    );
-
-  color: #fff;
-
   min-height: 100vh;
-
+  padding: var(--space-4) var(--space-3) calc(96px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(1000px 450px at -10% -25%, rgba(59, 130, 246, 0.2), transparent 60%),
+    radial-gradient(1000px 450px at 115% -15%, rgba(34, 211, 238, 0.16), transparent 62%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1));
+  color: var(--text-main);
+  font-family: "Manrope", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   display: flex;
   flex-direction: column;
-
   align-items: center;
-
-  padding:
-    24px
-    16px
-    80px;
 }
-
-/* =========================
-   CONTAINER
-========================= */
 
 .step,
 .confirm-box,
-.modal__dialog {
+.modal__dialog,
+.price-and-cart,
+.nav-buttons,
+.progress {
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
 }
-
-/* =========================
-   TYPOGRAPHY
-========================= */
 
 p,
 li,
 label,
 input,
-button {
-  font-size: 16px;
+button,
+a {
+  font-size: clamp(15px, 1.8vw, 16px);
   line-height: 1.45;
 }
 
-strong {
-  font-weight: 700;
+a {
+  color: #7dd3fc;
 }
-
-h3 {
-  margin-top: 0;
-}
-
-/* =========================
-   PRICE HEADER
-========================= */
 
 .price-and-cart {
-  width: 100%;
-  max-width: 720px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  margin-bottom: 24px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .price-pill {
   min-height: 48px;
-
-  display: flex;
+  display: inline-flex;
   align-items: center;
-
-  padding: 0 18px;
-
+  padding: 0 var(--space-4);
   border-radius: 999px;
-
-  background: rgba(255,255,255,0.08);
-
-  border: 1px solid rgba(255,255,255,0.08);
-
-  font-weight: 700;
-  font-size: 15px;
-
-  backdrop-filter: blur(12px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-weight: 800;
+  backdrop-filter: blur(10px);
 }
 
 .bt-help {
   width: 48px;
   height: 48px;
-
-  border: none;
-  border-radius: 50%;
-
+  border: 1px solid rgba(125, 211, 252, 0.26);
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
   cursor: pointer;
-
-  background: #2563eb;
-  color: white;
-
-  font-size: 20px;
-
-  transition:
-    transform 0.15s ease,
-    background 0.2s ease;
+  box-shadow: var(--shadow-2);
+  transition: transform 0.16s ease, filter 0.16s ease;
 }
 
-.bt-help:hover {
-  background: #1d4ed8;
-}
-
-.bt-help:active {
-  transform: scale(0.96);
-}
-
-/* =========================
-   STEP CARD
-========================= */
+.bt-help:hover { filter: brightness(1.05); }
+.bt-help:active { transform: translateY(1px) scale(0.98); }
 
 .step {
-  background:
-    rgba(255,255,255,0.06);
-
-  border:
-    1px solid rgba(255,255,255,0.08);
-
-  border-radius: 28px;
-
-  padding:
-    28px
-    22px;
-
-  backdrop-filter: blur(14px);
-
-  box-shadow:
-    0 10px 40px rgba(0,0,0,0.35);
-
-  margin-bottom: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-4);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-1);
+  margin-bottom: var(--space-4);
 }
 
 .step p {
-  margin-top: 0;
-  margin-bottom: 20px;
-
-  font-size: 18px;
+  margin: 0 0 var(--space-4);
 }
 
-/* =========================
-   BUTTON GROUPS
-========================= */
+.step p strong {
+  font-size: clamp(18px, 2.8vw, 20px);
+}
 
 .buttons {
   display: flex;
   flex-wrap: wrap;
-
-  gap: 14px;
-
-  margin-bottom: 18px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
-.accounts-label {
-  margin-bottom: 4px;
+.accounts-label,
+.buttons > span {
+  width: 100%;
+  color: var(--text-soft);
+  font-weight: 700;
 }
-
-/* =========================
-   BUTTONS
-========================= */
 
 .btn {
   appearance: none;
-
-  border: none;
-  outline: none;
-
-  cursor: pointer;
-
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  min-height: 52px;
+  padding: 12px 14px;
+  font-weight: 700;
+  text-align: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  min-height: 54px;
-
-  padding:
-    14px
-    18px;
-
-  border-radius: 18px;
-
-  background:
-    rgba(255,255,255,0.08);
-
-  color: white;
-
-  font-weight: 600;
-
-  text-align: center;
-
-  transition:
-    transform 0.15s ease,
-    background 0.2s ease,
-    border 0.2s ease;
-
-  border:
-    1px solid rgba(255,255,255,0.08);
-
-  flex: 1 1 calc(50% - 14px);
-
-  min-width: 140px;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+  flex: 1 1 100%;
 }
 
 .btn:hover {
-  background:
-    rgba(255,255,255,0.12);
+  border-color: rgba(125, 211, 252, 0.5);
+  background: rgba(255, 255, 255, 0.11);
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: translateY(1px);
+}
+
+.btn:focus-visible,
+.email:focus-visible,
+.modal__close:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .btn.selected {
-  background: #2563eb;
-  border-color: #3b82f6;
+  background: linear-gradient(130deg, rgba(34, 211, 238, 0.36), rgba(59, 130, 246, 0.44));
+  border-color: rgba(125, 211, 252, 0.6);
+  box-shadow: var(--shadow-2);
 }
 
 .btn.full {
@@ -254,331 +182,198 @@ h3 {
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.58;
   cursor: not-allowed;
 }
 
-/* =========================
-   NAVIGATION
-========================= */
-
-.nav-buttons {
-  width: 100%;
-  max-width: 720px;
-
-  margin-top: 8px;
-}
-
-#back {
-  flex: 0 0 120px;
-}
-
-#next {
-  flex: 1;
-}
-
-/* =========================
-   SUMMARY
-========================= */
-
 .confirm-box {
-  background:
-    rgba(255,255,255,0.04);
-
-  border-radius: 22px;
-
-  padding: 18px;
-
-  border:
-    1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
 }
 
-#summary p {
-  margin:
-    10px
-    0;
-}
-
+#summary p { margin: 8px 0; }
 #summary hr {
-  border: none;
-  border-top:
-    1px solid rgba(255,255,255,0.1);
-
-  margin:
-    18px
-    0;
-}
-
-/* =========================
-   INPUTS
-========================= */
-
-.field {
-  margin-top: 18px;
-}
-
-.email-label {
-  display: block;
-  margin-bottom: 8px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 14px 0;
 }
 
 .email {
   width: 100%;
-
-  height: 56px;
-
-  border-radius: 16px;
-
-  border:
-    1px solid rgba(255,255,255,0.1);
-
-  background:
-    rgba(255,255,255,0.08);
-
-  color: white;
-
-  padding:
-    0 16px;
-
-  font-size: 16px;
-
-  outline: none;
-
-  transition:
-    border 0.2s ease,
-    background 0.2s ease;
-}
-
-.email:focus {
-  border-color: #3b82f6;
-  background:
-    rgba(255,255,255,0.12);
+  height: 52px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
 }
 
 .email::placeholder {
-  color:
-    rgba(255,255,255,0.45);
+  color: var(--text-hint);
 }
 
-/* =========================
-   PROGRESS BAR
-========================= */
+.email:focus {
+  border-color: rgba(125, 211, 252, 0.72);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#email-error,
+#os-error {
+  color: var(--danger) !important;
+  font-weight: 600;
+}
 
 .progress {
-  width: 100%;
-  max-width: 720px;
-
   height: 10px;
-
   border-radius: 999px;
-
-  background:
-    rgba(255,255,255,0.08);
-
   overflow: hidden;
-
-  margin:
-    8px 0 18px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 0 var(--space-4);
 }
 
 .progress-bar {
   height: 100%;
-
-  width: 33%;
-
-  background:
-    linear-gradient(
-      90deg,
-      #2563eb,
-      #60a5fa
-    );
-
-  transition:
-    width 0.25s ease;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.25s ease;
 }
 
-/* =========================
-   MODAL
-========================= */
+.nav-buttons {
+  position: fixed;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  z-index: 40;
+  margin: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(11, 18, 32, 0.88);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-1);
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: var(--space-2);
+}
+
+#back {
+  width: 100%;
+}
+
+#next,
+#ok-btn {
+  width: 100%;
+}
+
+.nav-buttons #next.single-next {
+  grid-column: 2;
+}
 
 .modal {
   position: fixed;
   inset: 0;
-
   display: none;
-
   align-items: center;
   justify-content: center;
-
-  padding: 20px;
-
-  background:
-    rgba(0,0,0,0.7);
-
+  padding: var(--space-3);
+  background: rgba(0, 0, 0, 0.72);
   z-index: 999;
 }
 
-.modal.active {
-  display: flex;
-}
+.modal.active { display: flex; }
 
 .modal__dialog {
-  background:
-    #111827;
-
-  border-radius: 28px;
-
-  padding:
-    26px
-    22px;
-
-  max-height: 90vh;
-
-  overflow-y: auto;
-
-  border:
-    1px solid rgba(255,255,255,0.08);
-
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-4);
+  background: #111827;
 }
 
 .modal__close {
   position: absolute;
-
-  top: 16px;
-  right: 16px;
-
-  width: 42px;
-  height: 42px;
-
-  border-radius: 50%;
-
-  border: none;
-
-  background:
-    rgba(255,255,255,0.08);
-
-  color: white;
-
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
   cursor: pointer;
-
-  font-size: 22px;
 }
 
-/* =========================
-   ACCORDION
-========================= */
-
 .acc-item {
-  border-bottom:
-    1px solid rgba(255,255,255,0.08);
-
-  padding:
-    12px
-    0;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .acc-item summary {
   cursor: pointer;
-
   list-style: none;
-
-  font-weight: 600;
-
-  padding-right: 24px;
+  font-weight: 700;
 }
 
-.acc-item summary::-webkit-details-marker {
-  display: none;
+.acc-item summary::-webkit-details-marker { display: none; }
+
+.acc-body,
+.acc-body li,
+.acc-body p {
+  color: var(--text-soft);
 }
 
-.acc-body {
-  padding-top: 14px;
-}
-
-.acc-body p,
-.acc-body li {
-  color:
-    rgba(255,255,255,0.86);
-}
-
-.acc-body a {
-  color: #60a5fa;
-}
-
-/* =========================
-   LINKS
-========================= */
-
-a {
-  color: #60a5fa;
-}
-
-a:hover {
-  opacity: 0.9;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 640px) {
-
+@media (min-width: 700px) {
   body {
-    padding:
-      18px
-      12px
-      100px;
-  }
-
-  .step {
-    padding:
-      22px
-      16px;
+    padding: var(--space-6) var(--space-4) var(--space-6);
   }
 
   .btn {
-    flex: 1 1 100%;
-    min-width: unset;
+    flex: 1 1 calc(50% - 12px);
+    min-width: 170px;
   }
 
   .nav-buttons {
-    flex-wrap: nowrap;
+    position: static;
+    display: flex;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
   }
 
-  .price-pill {
-    font-size: 14px;
+  #back {
+    flex: 0 0 130px;
   }
 
-  .step p {
-    font-size: 17px;
+  #next,
+  #ok-btn {
+    flex: 1;
+  }
+
+  .nav-buttons #next.single-next {
+    margin-left: auto;
+    max-width: calc(100% - 142px);
   }
 }
 
-/* =========================
-   DESKTOP ENHANCEMENTS
-========================= */
-
 @media (min-width: 1024px) {
-
-  body {
-    padding-top: 48px;
-  }
-
   .step {
-    padding:
-      36px
-      32px;
-  }
-
-  .btn {
-    min-height: 58px;
-    font-size: 16px;
+    padding: 34px 30px;
   }
 
   .modal__dialog {
-    padding:
-      36px
-      32px;
+    padding: 32px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }

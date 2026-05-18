@@ -81,8 +81,18 @@ function bindOptions() {
   document.querySelectorAll('.option').forEach(btn => {
     btn.addEventListener('click', () => {
       const { plan, accounts, duration } = btn.dataset;
-      if (plan)     state.plan = plan;
-      if (accounts) state.accounts = accounts;
+      if (plan) {
+        state.plan = plan;
+        if (plan === 'Роутер') {
+          state.accounts = null;
+        }
+      }
+      if (accounts) {
+        state.accounts = accounts;
+        if (state.plan === 'Роутер') {
+          state.plan = null;
+        }
+      }
       if (duration) state.duration = duration;
       updateButtons();
       updateSummary();
@@ -194,6 +204,12 @@ function render() {
     okBtn.style.display   = 'none';
     backBtn.style.display = currentStep === 1 ? 'none' : 'inline-flex';
     nextBtn.textContent   = currentStep === 3 ? 'Подтвердить' : 'Далее';
+  }
+
+  if (currentStep === 1) {
+    nextBtn.classList.add('single-next');
+  } else {
+    nextBtn.classList.remove('single-next');
   }
 }
 
