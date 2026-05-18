@@ -316,6 +316,7 @@ function showReceipt(orderId) {
 async function submitOrder() {
 
   nextBtn.disabled = true;
+  nextBtn.classList.add('is-loading');
   nextBtn.textContent = 'Отправка…';
 
   try {
@@ -352,6 +353,7 @@ async function submitOrder() {
     nextBtn.textContent = 'Подтвердить';
   } finally {
     nextBtn.disabled = false;
+    nextBtn.classList.remove('is-loading');
   }
 }
 
@@ -393,5 +395,6 @@ function closeHelpModal(modal) {
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
 
 
