@@ -328,9 +328,12 @@ summary:focus-visible {
 }
 
 .modal__dialog--help {
-  width: min(960px, 100%);
+  width: min(1120px, calc(100vw - 32px));
+  height: min(90vh, 920px);
   max-height: 90vh;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal__title {
@@ -340,10 +343,19 @@ summary:focus-visible {
 
 .help-frame {
   width: 100%;
-  height: min(78vh, 760px);
+  flex: 1 1 auto;
+  min-height: 360px;
+  height: auto;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: #0f172a;
+}
+
+@media (min-width: 1024px) {
+  .modal__dialog--help {
+    width: min(1200px, calc(100vw - 56px));
+    height: min(92vh, 980px);
+  }
 }
 
 .modal__close {
