@@ -1,9 +1,10 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 
 const { sendMail } = require('../mailer');
 const { buildOrderEmail } = require('../emailTemplates');
 const { appendOrder, upsertCustomer, getCustomerByEmail } = require('../googleSheets');
+const { sendTelegramAdminOrderAlert } = require('../telegramNotifier');
 
 router.post('/order', async (req, res) => {
   try {
@@ -36,15 +37,15 @@ router.post('/order', async (req, res) => {
     // =========================
 
     try {
-      // Проверяем существование клиента по email
-      // upsertCustomer сам найдёт запись и увеличит order_count
+      // РџСЂРѕРІРµСЂСЏРµРј СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ РєР»РёРµРЅС‚Р° РїРѕ email
+      // upsertCustomer СЃР°Рј РЅР°Р№РґС‘С‚ Р·Р°РїРёСЃСЊ Рё СѓРІРµР»РёС‡РёС‚ order_count
       await upsertCustomer({
-        user_id: orderId,   // для новых клиентов — orderId как id
+        user_id: orderId,   // РґР»СЏ РЅРѕРІС‹С… РєР»РёРµРЅС‚РѕРІ вЂ” orderId РєР°Рє id
         username: order.name || '',
         email: order.email
       });
 
-      // Записываем заказ в лист Orders
+      // Р—Р°РїРёСЃС‹РІР°РµРј Р·Р°РєР°Р· РІ Р»РёСЃС‚ Orders
       await appendOrder({
         email: order.email,
         plan: order.plan,
@@ -94,6 +95,15 @@ router.post('/order', async (req, res) => {
       });
     }
 
+    // =========================
+    // TELEGRAM ADMIN ALERT
+    // =========================
+    try {
+      await sendTelegramAdminOrderAlert(order.id);
+    } catch (tgErr) {
+      console.warn('Telegram notify failed:', tgErr.message);
+    }
+
     res.json({ ok: true, orderId });
 
   } catch (err) {
@@ -103,3 +113,4 @@ router.post('/order', async (req, res) => {
 });
 
 module.exports = router;
+
