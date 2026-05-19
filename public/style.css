@@ -327,6 +327,25 @@ summary:focus-visible {
   background: #111827;
 }
 
+.modal__dialog--help {
+  width: min(960px, 100%);
+  max-height: 90vh;
+  padding: 16px;
+}
+
+.modal__title {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.help-frame {
+  width: 100%;
+  height: min(78vh, 760px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0f172a;
+}
+
 .modal__close {
   position: absolute;
   top: 12px;

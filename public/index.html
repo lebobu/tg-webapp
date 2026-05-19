@@ -124,96 +124,11 @@
 
 <!-- Help modal -->
 <div id="help-modal" class="modal" aria-hidden="true">
-  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" aria-describedby="help-body">
+  <div class="modal__dialog modal__dialog--help" role="dialog" aria-modal="true" aria-labelledby="help-title">
     <button class="modal__close" type="button" aria-label="Закрыть" data-close>&times;</button>
-
-    <h3 id="help-title" class="modal__title">&nbsp;&nbsp;&nbsp;?</h3>
-    <div class="accordion" id="help-accordion">
-  
-  <details class="acc-item" open>
-    <summary><span>Важная информация о сервисе</span></summary>
-    <div class="acc-body">
-      <ul>
-        <li>Не используйте сервис для криминальной деятельности, продажи запрещенных веществ или распространения порнографии. 
-          Вы оплачиваете сервис своей банковской картой, а это значит, что вы не являетесь анонимом. И если полиция будет расследовать уголовное дело,
-           в котором фигурирует ваш аккаунт, то ваше имя там всплывёт. Поэтому никогда не выкладывайте ваши учётные данные в открытый доступ и не передавайте посторонним пользователям,
-            иначе вам возможно придётся отвечать за чужие действия. И, разумеется, сервис не сделает вас анонимным, если вы заходите в социальные сети под учёткой с вашим настоящим именем.
-        </li>
-      </ul>
-    </div>
-  </details>
-  
-  <details class="acc-item">
-    <summary><span>Как оформить заказ</span></summary>
-    <div class="acc-body">
-      <ul>
-        <li>Выберите тариф на шаге 1.</li>
-        <li>На шаге 2 укажите параметры (для спец-тарифов — только срок)</li>
-        <li>На шаге 3 проверьте сумму, введите e-mail для отслеживания подписки и нажмите «Подтвердить»</li>
-        <li>1 аккаунт позволяет включать сервис на любом устройстве в текущий момент времени</li> 
-        <li>2 и более аккаунта позволяют работать одновременно на разных устройствах</li>
-      </ul>
-    </div>
-  </details>
-
-  <details class="acc-item">
-    <summary><span>Как оплатить заказ</span></summary>
-    <div class="acc-body">
-      <ul>
-        <li>Через СБП по номеру телефона +79957979609</li>
-        <li>По номеру банковской карты 5536090318609271</li>
-        <li>Совкомбанк Владимир А.</li>
-      </ul>
-    </div>
-  </details>
-
-  <details class="acc-item">
-    <summary><span>Тарифы</span></summary>
-    <div class="acc-body">
-      <div id="pricing-tables"></div>
-    </div>
-  </details>
-
-  <details class="acc-item">
-    <summary><span>Как установить и запустить</span></summary>
-    <div class="acc-body">
-      <ol>
-        <li>Скачайте и установите приложениe <b>Hiddify</b> под вашу операционную систему:
-          
-        <b>Android</b>:&nbsp
-                <a href=https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-Android-universal.apk>ссылка 1</a>&nbsp &nbsp
-                <a href=https://play.google.com/store/apps/details?id=app.hiddify.com&pcampaignid=web_share>Google Play ссылка 2</a><br>
-        
-        <b>Windows</b>:
-                <a href=https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-Windows-Setup-x64.Msix>ссылка</a><br>
-
-        <b>iOS</b>:
-                <a href=https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone>ссылка 1</a><br>
-                <a href=https://apps.apple.com/it/app/v2raytun/id6476628951>Альтернатива - приложение V2RayTun ссылка 2</a><br>
-
-        <b>macOS</b>:
-                <a href=https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-MacOS.dmg>ссылка</a><br>
-
-        <b>Linux</b>:
-                <a href=https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-Linux-x64.AppImage>ссылка</a><br>               
-
-        <li>Скопируйте полученный ключ доступа.</li>
-        <li>Откройте приложение-клиент. Нажмите <b>+</b>, вставьте ключ и нажмите кнопку ВКЛ</li>
-      </ol>
-      <p>Теперь у вас есть доступ к свободному интернету. Чтобы убедиться, что вы подключились к серверу, проверьте работу заблокированных ресурсов</p>
-    </div>
-  </details>
-
-  <details class="acc-item">
-    <summary><span>Частые вопросы</span></summary>
-    <div class="acc-body">
-      <p><b>Можно ли изменить заказ?</b><br>Да, перезапустите мини-приложение и отправьте новую заявку</p>
-      <p><b>Не приходит сообщение в чат?</b><br>Проверьте подключение и e-mail, затем повторите подтверждение</p>
-      <p><b>Есть ли бесплатный тестовый период?</b><br>Да, для новых клиентов первые 2 недели для 1 аккаунта ознакомительные, без оплаты</p>
-    </div>
-  </details>`r`n</div>
-  
-</div>
+    <h3 id="help-title" class="modal__title">Справка</h3>
+    <iframe class="help-frame" src="help.html?v=20260519-1" title="Справка"></iframe>
+  </div>
 </div>
 
 <!-- ваш скрипт -->

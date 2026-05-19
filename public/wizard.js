@@ -367,6 +367,7 @@ function bindHelpModal() {
   const openBtn = document.querySelector('.bt-help');
 
   openBtn.addEventListener('click', () => {
+    modal.querySelectorAll('details[open]').forEach(d => d.removeAttribute('open'));
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
   });
@@ -396,6 +397,5 @@ function closeHelpModal(modal) {
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-
 
 
