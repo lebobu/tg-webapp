@@ -304,6 +304,7 @@ function showReceipt(orderId) {
 
     <p style="margin-top:16px;color:rgba(255,255,255,0.7);font-size:14px;line-height:1.5">
       Ключ доступа будет выдан в течение 2-х часов. Ожидаем оплату в ближайшие сутки, спасибо за заказ</br>
+      <a href="help.html#install" target="_blank" rel="noopener">Как установить и запустить</a><br>
       <a href="https://t.me/polpo2022" target="_blank" rel="noopener">чат поддержки в Телеграм</a>
     </p>
   `;
