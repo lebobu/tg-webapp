@@ -307,8 +307,12 @@ function showReceipt(orderId) {
       <span style="display:block;text-align:center;margin:10px 0;">
         <a href="help.html#install" target="_blank" rel="noopener">Как установить и запустить</a>
       </span>
-      <a href="https://t.me/polpo2022" target="_blank" rel="noopener">Чат поддержки в Телеграм</a></br>
-      <a href="mailto:sicuro.vpn@gmail.com">E-mail поддержки</a>
+      <span style="display:block;text-align:right;margin:10px 0;">
+        <a href="https://t.me/polpo2022" target="_blank" rel="noopener">Чат поддержки в Телеграм</a></br>
+      </span>
+      <span style="display:block;text-align:right;margin:10px 0;">
+        <a href="mailto:sicuro.vpn@gmail.com">E-mail поддержки</a>
+      </span>
       
     </p>
   `;
