@@ -91,4 +91,16 @@
     </details>
   </main>
 </body>
+<script>
+  function openInstallSectionFromHash() {
+    if (window.location.hash !== '#install') return;
+    const install = document.getElementById('install');
+    if (!install) return;
+    install.setAttribute('open', '');
+    install.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.addEventListener('DOMContentLoaded', openInstallSectionFromHash);
+  window.addEventListener('hashchange', openInstallSectionFromHash);
+</script>
 </html>
