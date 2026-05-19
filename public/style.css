@@ -268,8 +268,11 @@ summary:focus-visible {
 
 .nav-buttons {
   position: fixed;
-  left: calc(var(--space-3) + var(--step-pad-x));
-  right: calc(var(--space-3) + var(--step-pad-x));
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: calc(100% - ((var(--space-3) + var(--step-pad-x)) * 2));
+  max-width: calc(760px - (var(--step-pad-x) * 2));
   bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
   z-index: 40;
   margin: 0;
@@ -372,6 +375,7 @@ summary:focus-visible {
 
   .nav-buttons {
     position: static;
+    transform: none;
     width: calc(100% - (var(--step-pad-x) * 2));
     max-width: calc(760px - (var(--step-pad-x) * 2));
     margin: 0 auto;
